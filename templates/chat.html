@@ -2,9 +2,21 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Chat - Secure Chat App</title>
+    <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
-
+    <h1>Chat</h1>
+    <div id="messages">
+        <!-- Chat messages will be inserted here dynamically using JavaScript -->
+    </div>
+    <form id="send-message-form" action="{{ url_for('send_message') }}" method="post">
+        <input type="text" id="message" name="message" required>
+        <input type="submit" value="Send">
+    </form>
+    <form action="{{ url_for('logout') }}" method="post">
+        <input type="submit" value="Logout">
+    </form>
 </body>
+<script src="/static/script.js"></script>
 </html>
