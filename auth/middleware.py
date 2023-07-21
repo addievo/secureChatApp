@@ -1,4 +1,5 @@
-from flask import request, Flask, Limiter, session
+from flask import request, session
+
 from app import app
 
 
@@ -6,8 +7,6 @@ from app import app
 def log_request_info():
     app.logger.debug('Headers: %s', request.headers)
     app.logger.debug('Body: %s', request.get_data())
-
-
 
 
 @app.errorhandler(500)
