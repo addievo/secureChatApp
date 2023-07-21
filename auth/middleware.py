@@ -1,4 +1,6 @@
-from flask import request, session
+from functools import wraps
+
+from flask import session, request, redirect, url_for
 
 from app import app
 
@@ -15,7 +17,10 @@ def handle_internal_error():
 
 
 @app.before_request
-def require_login():
-    allowed_routes = ['login', 'signup']
-    if request.endpoint not in allowed_routes and 'username' not in session:
-        return 'Unauthorised', 401
+def require_login(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'username' not in session:
+            return redirect(url_for('login', next=request.url))
+        return f(*args, **kwargs)
+    return decorated_function
