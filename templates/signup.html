@@ -2,9 +2,18 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Sign Up - Secure Chat App</title>
+    <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
-
+    <h1>Sign Up</h1>
+    <form action="signup.html" method="post">
+        <label for="username">Username:</label><br>
+        <input type="text" id="username" name="username" required><br>
+        <label for="password">Password:</label><br>
+        <input type="password" id="password" name="password" required><br>
+        <input type="submit" value="Sign Up">
+    </form>
+    <p>Already have an account? <a href="login.html">Login</a></p>
 </body>
 </html>
