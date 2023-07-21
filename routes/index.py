@@ -1,15 +1,16 @@
-from flask import Flask, Limiter, render_template, redirect, url_for, request, session
+from flask import Flask, render_template, redirect, url_for, request, session
 from database.database import get_user, create_user
 from encryption.key_generation import generate_key_pair
 from werkzeug.security import generate_password_hash, check_password_hash
 from app import app
+from flask_limiter import Limiter
 
 
 def get_remote_address():
     return request.remote_addr
 
 
-limiter = Limiter(app, key_func=get_remote_address)
+limiter = Limiter(app=app, key_func=get_remote_address)
 
 @app.route('/')
 def index():
@@ -18,7 +19,7 @@ def index():
     else:
         return redirect(url_for('login'))
 
-@app.route('signup', methods=['GET', 'POST'])
+@app.route('/signup', methods=['GET', 'POST'])
 @limiter.limit('5 per minute')
 def signup():
     if request.method =='POST':
