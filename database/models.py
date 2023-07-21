@@ -12,6 +12,8 @@ class User(Base):
     password_hash = Column(String, nullable=False)
     public_key = Column(String, nullable=False)
     private_key = Column(String, nullable=False)
+    avatar = Column(String)
+    status = Column(String)
 
     messages_sent = relationship("Message", backref='sender', foreign_keys='Message.sender_id')
     messages_received = relationship("Message", backref='receiver', foreign_keys='Message.receiver_id')
