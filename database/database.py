@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from models import Base, User, Message
+from .models import Base, User, Message
 
 engine = create_engine('sqlite:///chat.db')  # Use SQLite for simplicity
 Base.metadata.create_all(engine)
