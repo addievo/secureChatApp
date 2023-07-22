@@ -12,6 +12,7 @@ def get_remote_address():
 
 limiter = Limiter(app=app, key_func=get_remote_address)
 
+
 @app.route('/')
 def index():
     if 'username' in session:
@@ -19,15 +20,16 @@ def index():
     else:
         return redirect(url_for('login'))
 
+
 @app.route('/signup', methods=['GET', 'POST'])
 @limiter.limit('5 per minute')
 def signup():
-    if request.method =='POST':
+    if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
         private_key, public_key = generate_key_pair()
 
-        #hashing the password
+        # hashing the password
 
         password_hash = generate_password_hash(password)
         create_user(username, password_hash, public_key, private_key)
@@ -36,10 +38,12 @@ def signup():
     else:
         return render_template('signup.html')
 
+
+
 @app.route('/login', methods=['GET', 'POST'])
 @limiter.limit('5 per minute')
 def login():
-    if request.method=='POST':
+    if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
 
@@ -50,6 +54,9 @@ def login():
             return redirect(url_for('index'))
         else:
             return 'Invalid username or password', 401
+    else:
+        return render_template('login.html')
+
 
 @app.route('/logout', methods=['POST'])
 def logout():
