@@ -1,6 +1,8 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from .models import Base, User, Message
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.backends import default_backend
 
 engine = create_engine('sqlite:///chat.db')  # Use SQLite for simplicity
 Base.metadata.create_all(engine)
@@ -8,21 +10,36 @@ Base.metadata.create_all(engine)
 Session = sessionmaker(bind=engine)
 
 
+# serialising RSA keys while loading from database
 def get_user(username):
     session = Session()
     user = session.query(User).filter_by(username=username).first()
+    if user:
+        public_key = serialization.load_pem_public_key(user.public_key.encode(), backend=default_backend())
+        private_key = serialization.load_pem_private_key(user.private_key.encode(), password=None,
+                                                         backend=default_backend())
+        user.public_key = public_key
+        user.private_key = private_key
     session.close()
     return user
 
 
+# editing create user to convert RSA keys to strings before saving
 def create_user(username, password_hash, public_key, private_key):
     session = Session()
-    user = User(username=username, password_hash=password_hash, public_key=public_key, private_key=private_key)
+    public_key_string = public_key.public_bytes(encoding=serialization.Encoding.PEM,
+                                                format=serialization.PublicFormat.SubjectPublicKeyInfo).decode('utf-8')
+    private_key_string = private_key.private_bytes(encoding=serialization.Encoding.PEM,
+                                                   format=serialization.PrivateFormat.TraditionalOpenSSL,
+                                                   encryption_algorithm=serialization.NoEncryption()).decode('utf-8')
+    user = User(username=username, password_hash=password_hash, public_key=public_key_string,
+                private_key=private_key_string)
     session.add(user)
     session.commit()
     session.close()
 
 
+# editing update user to convert RSA keys to strings before saving
 def update_user(username, new_username=None, new_password_hash=None, new_public_key=None, new_private_key=None,
                 new_avatar=None, new_status=None):
     session = Session()
@@ -37,9 +54,16 @@ def update_user(username, new_username=None, new_password_hash=None, new_public_
     if new_password_hash is not None:
         user.password_hash = new_password_hash
     if new_public_key is not None:
-        user.public_key = new_public_key
+        public_key_string = new_public_key.public_bytes(encoding=serialization.Encoding.PEM,
+                                                        format=serialization.PublicFormat.SubjectPublicKeyInfo).decode(
+            'utf-8')
+        user.public_key = public_key_string
     if new_private_key is not None:
-        user.private_key = new_private_key
+        private_key_string = new_private_key.private_bytes(encoding=serialization.Encoding.PEM,
+                                                           format=serialization.PrivateFormat.TraditionalOpenSSL,
+                                                           encryption_algorithm=serialization.NoEncryption()).decode(
+            'utf-8')
+        user.private_key = private_key_string
     if new_avatar is not None:
         user.avatar = new_avatar
     if new_status is not None:
