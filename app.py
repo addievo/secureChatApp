@@ -12,6 +12,12 @@ Session(app)
 
 #Import the routes
 
+#error handling
+
+@app.errorhandler(500)
+def handle_internal_error(error):
+    return 'Internal server error', 500
+
 from routes import index, chat, user
 
 if __name__ == '__main__':
