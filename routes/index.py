@@ -22,7 +22,7 @@ def index():
 
 
 @app.route('/signup', methods=['GET', 'POST'])
-@limiter.limit('5 per minute')
+@limiter.limit('50 per minute')
 def signup():
     if request.method == 'POST':
         username = request.form['username']
@@ -41,7 +41,7 @@ def signup():
 
 
 @app.route('/login', methods=['GET', 'POST'])
-@limiter.limit('5 per minute')
+@limiter.limit('50 per minute')
 def login():
     if request.method == 'POST':
         username = request.form['username']
