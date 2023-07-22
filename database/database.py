@@ -1,5 +1,5 @@
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy import create_engine, or_
+from sqlalchemy.orm import sessionmaker, joinedload
 from .models import Base, User, Message
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.backends import default_backend
@@ -18,8 +18,8 @@ def get_user(username):
         public_key = serialization.load_pem_public_key(user.public_key.encode(), backend=default_backend())
         private_key = serialization.load_pem_private_key(user.private_key.encode(), password=None,
                                                          backend=default_backend())
-        user.public_key = public_key
-        user.private_key = private_key
+        user = User(username=user.username, password_hash=user.password_hash,
+                    public_key=public_key, private_key=private_key, avatar=user.avatar, status=user.status)
     session.close()
     return user
 
@@ -79,6 +79,20 @@ def get_message(message_id):
     message = session.query(Message).filter_by(id=message_id).first()
     session.close()
     return message
+
+
+# modifying to add joinedLoad to only load messages from same instance
+
+def get_messages_for_user(user_id):
+    session = Session()
+    messages = session.query(Message).options(
+        joinedload(Message.sender),
+        joinedload(Message.receiver)
+    ).filter(
+        or_(Message.sender_id == user_id, Message.receiver_id == user_id)
+    ).all()
+    session.close()
+    return messages
 
 
 def create_message(sender_id, receiver_id, content, timestamp):
