@@ -15,8 +15,10 @@ limiter = Limiter(app=app, key_func=get_remote_address)
 
 @app.route('/')
 def index():
+
     if 'username' in session:
-        return render_template('chat.html')
+        username = get_user(session['username']).username
+        return render_template('chat.html',username=username)
     else:
         return redirect(url_for('login'))
 
