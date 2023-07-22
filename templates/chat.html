@@ -11,8 +11,9 @@
         <!-- Chat messages will be inserted here dynamically using JavaScript -->
     </div>
     <form id="send-message-form" action="{{ url_for('send_message') }}" method="post">
-        <input type="text" id="message" name="message" required>
-        <input type="submit" value="Send">
+    <input type="text" id="receiver_username" name="receiver_username" placeholder="Recipient's username" required>
+    <input type="text" id="message" name="message" placeholder="Your message" required>
+    <input type="submit" value="Send">
     </form>
     <form action="{{ url_for('logout') }}" method="post">
         <input type="submit" value="Logout">
