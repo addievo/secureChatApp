@@ -1,12 +1,12 @@
 import os
 import secrets
 
-from flask import current_app
+from flask import current_app, Blueprint
 from flask import request, session
 from werkzeug.security import generate_password_hash
 
-from app import app
 from database.database import get_user, update_user
+bp = Blueprint('user', __name__)
 
 
 def save_avatar(avatar):
@@ -25,7 +25,7 @@ def save_avatar(avatar):
     return filename
 
 
-@app.route('/update_profile', methods=['POST'])
+@bp.route('/update_profile', methods=['POST'])
 def update_profile():
     username = session['username']
     new_username = request.form.get('new_username')

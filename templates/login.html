@@ -7,13 +7,13 @@
 </head>
 <body>
     <h1>Login</h1>
-    <form action="{{ url_for('login') }}" method="post">
+    <form action="{{ url_for('index.login') }}" method="post">
         <label for="username">Username:</label><br>
         <input type="text" id="username" name="username" required><br>
         <label for="password">Password:</label><br>
         <input type="password" id="password" name="password" required><br>
         <input type="submit" value="Login">
     </form>
-    <p>Don't have an account? <a href="{{ url_for('signup') }}">Sign Up</a></p>
+    <p>Don't have an account? <a href="{{ url_for('index.signup') }}">Sign Up</a></p>
 </body>
 </html>

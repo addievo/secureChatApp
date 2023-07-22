@@ -11,14 +11,18 @@ Session = sessionmaker(bind=engine)
 
 
 # serialising RSA keys while loading from database
-def get_user(username):
+#added id = user.id
+def get_user(username, user_id=None):
     session = Session()
-    user = session.query(User).filter_by(username=username).first()
+    if user_id:
+        user = session.query(User).filter_by(id=user_id).first()
+    else:
+        user = session.query(User).filter_by(username=username).first()
     if user:
         public_key = serialization.load_pem_public_key(user.public_key.encode(), backend=default_backend())
         private_key = serialization.load_pem_private_key(user.private_key.encode(), password=None,
                                                          backend=default_backend())
-        user = User(username=user.username, password_hash=user.password_hash,
+        user = User(id=user.id, username=user.username, password_hash=user.password_hash,
                     public_key=public_key, private_key=private_key, avatar=user.avatar, status=user.status)
     session.close()
     return user
