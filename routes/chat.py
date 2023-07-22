@@ -45,7 +45,11 @@ def get_messages():
         try:
             decrypted_content = decrypt_message(user.private_key, message.content)
             decrypted_messages.append((message.sender, message.receiver, decrypted_content))
-        except ValueError:
+        except Exception as e:
             print(f"Failed to decrypt message with id {message.id}")
+            print(f"Encrypted message content: {message.content}")
+            print(f"Decryption key: {user.private_key}")
+            print(f"Receiver: {message.receiver}")
+            print(f"Exception: {str(e)}")
 
     return jsonify(decrypted_messages), 200
