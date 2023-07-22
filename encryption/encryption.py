@@ -8,10 +8,11 @@ def generate_key_pair():
     public_key = private_key.public_key()
     return private_key, public_key
 
-
+#changing message to bytes using utf-8 encoding
 def encrypt_message(public_key, message):
+    message_bytes = message.encode('utf-8')
     encrypted_message = public_key.encrypt(
-        message,
+        message_bytes,
         padding.OAEP(
             mgf=padding.MGF1(algorithm=hashes.SHA256()),
             algorithm=hashes.SHA256(),
@@ -20,9 +21,9 @@ def encrypt_message(public_key, message):
     )
     return encrypted_message
 
-
+#decrypting from bytes to string using utf-8 encoding
 def decrypt_message(private_key, encrypted_message):
-    decrypted_message = private_key.decrypt(
+    decrypted_message_bytes = private_key.decrypt(
         encrypted_message,
         padding.OAEP(
             mgf=padding.MGF1(algorithm=hashes.SHA256()),
@@ -30,4 +31,6 @@ def decrypt_message(private_key, encrypted_message):
             label=None
         )
     )
+
+    decrypted_message = decrypted_message_bytes.decode('utf-8')
     return decrypted_message
