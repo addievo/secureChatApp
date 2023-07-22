@@ -1,9 +1,11 @@
+from datetime import datetime
 from flask import request, session, jsonify
-
 from app import app
 from auth.middleware import require_login
-from database.database import get_user, create_message, get_message
+from database.database import get_user, create_message, get_messages_for_user
 from encryption.encryption import encrypt_message, decrypt_message
+
+current_time = datetime.now()
 
 
 @app.route('/send_message', methods=['POST'])
@@ -13,14 +15,20 @@ def send_message():
     receiver_username = request.form['receiver_username']
     content = request.form['message']
 
+    sender = get_user(sender_username)
     receiver = get_user(receiver_username)
+
+
     if receiver is None:
         return 'Receiver does not exist', 400
 
-    sender = get_user(sender_username)
-    encrypted_message = encrypt_message(content, sender.public_key)
 
-    create_message(sender_username, receiver_username, encrypted_message)
+    receiver_public_key = receiver.public_key
+
+
+    encrypted_message = encrypt_message(receiver_public_key, content)
+
+    create_message(sender.id, receiver.id, encrypted_message, current_time)
     return 'Message sent successfully', 200
 
 
@@ -30,10 +38,14 @@ def get_messages():
     username = session['username']
     user = get_user(username)
 
-    messages = get_message(username)
+    messages = get_messages_for_user(user.id)
 
-    decrypted_messages = [(message.sender, message.receiver, decrypt_message(message.content, user.private_key)) for message in messages]
+    decrypted_messages = []
+    for message in messages:
+        try:
+            decrypted_content = decrypt_message(user.private_key, message.content)
+            decrypted_messages.append((message.sender, message.receiver, decrypted_content))
+        except ValueError:
+            print(f"Failed to decrypt message with id {message.id}")
 
     return jsonify(decrypted_messages), 200
-
-
