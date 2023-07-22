@@ -11,12 +11,14 @@ from encryption.encryption import encrypt_message, decrypt_message
 def send_message():
     sender_username = session['username']
     receiver_username = request.form['receiver_username']
-    content = request.form['content']
+    content = request.form['message']
 
     receiver = get_user(receiver_username)
     if receiver is None:
         return 'Receiver does not exist', 400
-    encrypted_message = encrypt_message(content, receiver.public_key)
+
+    sender = get_user(sender_username)
+    encrypted_message = encrypt_message(content, sender.public_key)
 
     create_message(sender_username, receiver_username, encrypted_message)
     return 'Message sent successfully', 200
