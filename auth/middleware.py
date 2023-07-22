@@ -16,7 +16,6 @@ def handle_internal_error():
     return 'Internal Server Error', 500
 
 
-@app.before_request
 def require_login(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
