@@ -74,6 +74,6 @@ def get_messages():
         elif user.id == receiver.id:
             decrypted_content = decrypt_message(user.private_key, message.content_for_receiver)
 
-        decrypted_messages.append((sender.username, receiver.username, decrypted_content))
+        decrypted_messages.append((sender.username, receiver.username, decrypted_content, message.timestamp))
 
     return jsonify(decrypted_messages), 200
