@@ -21,7 +21,7 @@ def index():
         username = get_user(session['username']).username
         return render_template('chat.html',username=username)
     else:
-        return redirect(url_for('index.login'))
+        return render_template('index.html')
 
 
 @bp.route('/signup', methods=['GET', 'POST'])
