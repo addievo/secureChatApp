@@ -60,6 +60,7 @@ body, html {
     padding: 0.8rem 1.5rem;
     transition: all 0.3s;
     border-radius: 3px;
+    border: none;
     cursor: pointer;
     color: white;
     background-color: #3b82f6;
