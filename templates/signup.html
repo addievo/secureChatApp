@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>Sign Up - Secure Chat App</title>
     <link rel="stylesheet" href="/static/signup-styles.css">
-      <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js" integrity="sha512-Kef5sc7gfTacR7TZKelcrRs15ipf7+t+n7Zh6mKNJbmW+/RRdCW9nwfLn4YX0s2nO6Kv5Y2ChqgIakaC6PW09A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -15,6 +15,11 @@
         <div class="centered-content">
             <h1 class="h1">Sign Up for <span class="main-font text-blue">Secure Chat App</span></h1><br>
             <form action="{{ url_for('index.signup') }}" method="post" class="form">
+                {% if error %}
+                <div class="alert alert-danger" role="alert">
+                    {{ error }}
+                </div>
+                {% endif %}
                 <input type="text" id="username" name="username" required class="input" placeholder="Username">
                 <input type="password" id="password" name="password" required class="input" placeholder="Password"><br>
                 <input type="submit" value="Sign Up" class="btn-blue"><br>
