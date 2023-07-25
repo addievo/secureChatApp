@@ -54,6 +54,9 @@ body, html {
     border: none;
     border-radius: 3px;
 }
+input[type="password"] {
+    margin-top: 10px;
+}
 
 .btn-blue {
     display: inline-block;
@@ -73,6 +76,18 @@ body, html {
     border: 2px solid #0b63f3;
 }
 
-.login {
-    margin-top: 10px;
+.signup {
+    color: #f8f8f8;
+    font-size: 1.2em;
+    text-decoration: none;
+
+}
+
+input[type="text"], input[type="password"] {
+    padding: 10px;
+    font-size: 1.2em;
+    width: 100%;
+    max-width: 300px;
+    border: none;
+    border-radius: 3px;
 }
