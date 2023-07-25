@@ -78,13 +78,6 @@ def update_user(username, new_username=None, new_password_hash=None, new_public_
     return True
 
 
-def get_message(message_id):
-    session = Session()
-    message = session.query(Message).filter_by(id=message_id).first()
-    session.close()
-    return message
-
-
 # modifying to add joinedLoad to only load messages from same instance
 
 def get_messages_for_user(user_id):
@@ -99,9 +92,9 @@ def get_messages_for_user(user_id):
     return messages
 
 
-def create_message(sender_id, receiver_id, content, timestamp):
+def create_message(sender_id, receiver_id, content_for_sender, content_for_receiver, timestamp):
     session = Session()
-    message = Message(sender_id=sender_id, receiver_id=receiver_id, content=content, timestamp=timestamp)
+    message = Message(sender_id=sender_id, receiver_id=receiver_id, content_for_sender=content_for_sender,content_for_receiver=content_for_receiver, timestamp=timestamp)
     session.add(message)
     session.commit()
     session.close()

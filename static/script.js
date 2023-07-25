@@ -1,6 +1,5 @@
 let lastMessage = null;
 
-
 function fetchMessages() {
     fetch('/get_messages')
         .then(response => response.json())
@@ -22,6 +21,7 @@ function fetchMessages() {
                 const content = message[2];
 
                 const p = document.createElement('p');
+                p.className = sender === '{{ username }}' ? 'sent' : 'received';  // Add a class to distinguish between sent and received messages
 
                 if (content.startsWith("http") && (content.endsWith(".png") || content.endsWith(".jpg") || content.endsWith(".jpeg") || content.endsWith(".gif"))) {
                     const img = document.createElement('img');
@@ -54,8 +54,6 @@ function fetchMessages() {
             }
         });
 }
-
-
 
 document.getElementById('send-message-form').addEventListener('submit', function(event) {
     event.preventDefault(); // This line prevents the form from being submitted in the default way

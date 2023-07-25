@@ -25,10 +25,18 @@ def send_message():
     if receiver is None:
         return jsonify({"error": "Receiver does not exist"}), 400
 
+    #encrypting message for receiver using receiver's public key
     receiver_public_key = receiver.public_key
-    encrypted_message = encrypt_message(receiver_public_key, content)
-    create_message(sender.id, receiver.id, encrypted_message, current_time)
-    return jsonify({"message": "Message sent successfully"}), 200
+    encrypted_message_for_receiver = encrypt_message(receiver_public_key, content)
+
+    #encrypting message for sender using sender's public key
+    sender_public_key = sender.public_key
+    encrypted_message_for_sender = encrypt_message(sender_public_key, content)
+
+    #store both encrypted messages in database
+    create_message(sender.id, receiver.id, encrypted_message_for_sender, encrypted_message_for_receiver, current_time)
+
+    return jsonify({"success": "Message sent"}), 200
 
 
 @bp.route('/get_messages', methods=['GET'])
@@ -36,7 +44,6 @@ def send_message():
 def get_messages():
     username = session['username']
     user = get_user(username)
-    print("Current User = " + user.username)
 
     messages = get_messages_for_user(user.id)
 
@@ -44,23 +51,19 @@ def get_messages():
     for message in messages:
         sender = get_user(None, message.sender_id)
         receiver = get_user(None, message.receiver_id)
-        print("Receiver: " + receiver.username)
-        print("Sender: " + sender.username)
         if receiver is None:
             print(f"Skipping message with id {message.id} because receiver is None")
             continue
-        try:
-            decrypted_content = decrypt_message(user.private_key, message.content)
-            decrypted_messages.append((sender.username, receiver.username, decrypted_content))
-        except Exception as e:
-            print(f"Failed to decrypt message with id {message.id}")
-            print(f"Encrypted message content: {message.content}")
-            print(f"Decryption key: {user.private_key}")
-            print(f"Receiver: {receiver}")
-            print(f"Exception: {str(e)}")
+
+        # Decrypt the message content based on who the user is in the conversation
+        if user.id == sender.id:
+            decrypted_content = decrypt_message(user.private_key, message.content_for_sender)
+        elif user.id == receiver.id:
+            decrypted_content = decrypt_message(user.private_key, message.content_for_receiver)
+
+        decrypted_messages.append((sender.username, receiver.username, decrypted_content))
 
     return jsonify(decrypted_messages), 200
-
 
 # message stores user id, get_user is based on username, but get_messages is trying to get user based on their id,
 # which isn't how get_user works
