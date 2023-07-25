@@ -64,4 +64,4 @@ def login():
 @bp.route('/logout', methods=['POST'])
 def logout():
     session.pop('username', None)
-    return 'Logged out successfully', 200
+    return render_template('index.html')
