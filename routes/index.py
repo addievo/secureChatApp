@@ -33,6 +33,9 @@ def signup():
         private_key, public_key = generate_key_pair()
 
         # hashing the password
+        #check if user exists
+        if get_user(username):
+            return render_template('signup.html', error="Username is already taken.")
 
         password_hash = generate_password_hash(password)
         create_user(username, password_hash, public_key, private_key)
