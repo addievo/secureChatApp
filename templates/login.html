@@ -20,6 +20,9 @@
         <div class="centered-content">
             <h1 class="h1">Login to <span class="main-font text-blue">Secure Chat App</span></h1><br>
             <form action="{{ url_for('index.login') }}" method="post">
+                {% if error %}
+                <p class="error">{{ error }}</p>
+                {% endif %}
                 <input type="text" id="username" name="username" required placeholder="Username"><br>
                 <input type="password" id="password" name="password" required placeholder="Password"><br><br>
                 <input type="submit" class="btn-blue" value="Login">

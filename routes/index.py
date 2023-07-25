@@ -55,13 +55,18 @@ def login():
 
         user = get_user(username)
 
-        if user is not None and check_password_hash(user.password_hash, password):
+        if user is None:
+            # User does not exist
+            return render_template('login.html', error="Username does not exist."), 401
+        elif not check_password_hash(user.password_hash, password):
+            # Password is incorrect
+            return render_template('login.html', error="Password is incorrect."), 401
+        else:
             session['username'] = username
             return redirect(url_for('index.index'))  # Redirect to index after successful login
-        else:
-            return 'Invalid username or password', 401
     else:
         return render_template('login.html')
+
 
 
 @bp.route('/logout', methods=['POST'])
