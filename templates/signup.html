@@ -3,17 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <title>Sign Up - Secure Chat App</title>
-    <link rel="stylesheet" href="/static/styles.css">
+    <link rel="stylesheet" href="/static/signup-styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js" integrity="sha512-Kef5sc7gfTacR7TZKelcrRs15ipf7+t+n7Zh6mKNJbmW+/RRdCW9nwfLn4YX0s2nO6Kv5Y2ChqgIakaC6PW09A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!-- Import fonts from ref.html -->
+    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
 </head>
 <body>
-    <h1>Sign Up</h1>
-    <form action="{{ url_for('index.signup') }}" method="post">
-        <label for="username">Username:</label><br>
-        <input type="text" id="username" name="username" required><br>
-        <label for="password">Password:</label><br>
-        <input type="password" id="password" name="password" required><br>
-        <input type="submit" value="Sign Up">
-    </form>
-    <p>Already have an account? <a href="{{ url_for('index.login') }}">Login</a></p>
+    <div id="particles-js"></div>
+    <div class="content">
+        <div class="centered-content">
+            <h1 class="h1">Sign Up for <span class="main-font text-blue">Secure Chat App</span></h1><br>
+            <form action="{{ url_for('index.signup') }}" method="post" class="form">
+                <input type="text" id="username" name="username" required class="input" placeholder="Username">
+                <input type="password" id="password" name="password" required class="input" placeholder="Password"><br>
+                <input type="submit" value="Sign Up" class="btn-blue"><br>
+            </form>
+            <p class="login">Already have an account? <a href="{{ url_for('index.login') }}" class="text-blue">Login</a></p>
+        </div>
+    </div>
+    <script>
+        particlesJS.load('particles-js', '/static/particles.json', function() {
+            console.log('particles.json loaded...');
+        });
+    </script>
 </body>
 </html>

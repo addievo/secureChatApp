@@ -3,17 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <title>Login - Secure Chat App</title>
-    <link rel="stylesheet" href="/static/styles.css">
+    <link rel="stylesheet" href="/static/login-styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js" integrity="sha512-Kef5sc7gfTacR7TZKelcrRs15ipf7+t+n7Zh6mKNJbmW+/RRdCW9nwfLn4YX0s2nO6Kv5Y2ChqgIakaC6PW09A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!-- Import fonts from ref.html -->
+    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
 </head>
 <body>
-    <h1>Login</h1>
-    <form action="{{ url_for('index.login') }}" method="post">
-        <label for="username">Username:</label><br>
-        <input type="text" id="username" name="username" required><br>
-        <label for="password">Password:</label><br>
-        <input type="password" id="password" name="password" required><br>
-        <input type="submit" value="Login">
-    </form>
-    <p>Don't have an account? <a href="{{ url_for('index.signup') }}">Sign Up</a></p>
+    <div id="particles-js" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;">
+        <div class="bg-overlay"></div>
+        <div class="content">
+            <div class="centered-content">
+                <h1 class="h1">Login to <span class="main-font text-blue">Secure Chat App</span></h1>
+                <form action="{{ url_for('index.login') }}" method="post">
+                    <label for="username"></label>
+                    <input type="text" id="username" name="username" placeholder="Username" required><br>
+                    <label for="password"></label>
+                    <input type="password" id="password" name="password" placeholder="Password" required><br>
+                    <input type="submit" class="btn-blue" value="Login">
+                </form>
+                <p>Don't have an account? <a href="{{ url_for('index.signup') }}" class="text-blue">Sign Up</a></p>
+            </div>
+        </div>
+    </div>
+    <script>
+        particlesJS.load('particles-js', '/static/particles.json', function() {
+            console.log('particles.json loaded...');
+        });
+    </script>
 </body>
 </html>
