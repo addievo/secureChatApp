@@ -9,6 +9,13 @@ body, html {
     user-select: none;
 }
 
+.logo{
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 2;
+}
+
 #particles-js {
     position: fixed;
     top: 0;
