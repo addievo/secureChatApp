@@ -7,9 +7,23 @@ document.getElementById('start-conversation').addEventListener('click', function
     event.stopPropagation();
 
     const newConversationUsername = document.getElementById('new-conversation').value;
-    alert("Starting conversation with: " + newConversationUsername);
-
     const conversationList = document.getElementById('conversation-list');
+    const existingListItems = conversationList.getElementsByTagName('li');
+
+    // Check if a conversation with the same username already exists
+    for (let listItem of existingListItems) {
+        if (listItem.getAttribute('data-conversation') === newConversationUsername) {
+            // If it exists, simply make it the active conversation and fetch messages
+            document.getElementById('receiver_username').value = newConversationUsername;
+            activeConversation = newConversationUsername;
+            fetchMessages();
+            // Clear the new conversation input
+            document.getElementById('new-conversation').value = '';
+            return;  // Exit the function early
+        }
+    }
+
+    // If it doesn't exist, create a new conversation
     const listItem = document.createElement('li');
     listItem.setAttribute('data-conversation', newConversationUsername);
 
