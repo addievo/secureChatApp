@@ -1,16 +1,17 @@
-<!-- chat.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Chat - Secure Chat App</title>
     <link rel="stylesheet" href="/static/chat-styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js" integrity="sha512-Kef5sc7gfTacR7TZKelcrRs15ipf7+t+n7Zh6mKNJbmW+/RRdCW9nwfLn4YX0s2nO6Kv5Y2ChqgIakaC6PW09A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </head>
 <body>
-    <h1>Chat</h1>
-    <div id="current-username">
-        Current User: {{ username }}
-    </div>
+    <div id="particles-js"></div>
+    <h2 id="current-username">Current User: {{ username }}</h2>
     <div id="chat-container">
         <div id="sidebar">
             <h2>Conversations</h2>
@@ -19,7 +20,7 @@
             </ul>
             <h2>Start a new conversation</h2>
             <input type="text" id="new-conversation" placeholder="Enter username">
-            <button id="start-conversation">Start Conversation</button>
+            <button id="start-conversation" class="btn-blue">Start Conversation</button>
         </div>
         <div id="main-conversation">
             <div id="messages">
@@ -28,13 +29,20 @@
             <form id="send-message-form" action="{{ url_for('chat.send_message') }}" method="post">
                 <input type="hidden" id="receiver_username" name="receiver_username">
                 <input type="text" id="message" name="message" placeholder="Your message" required>
-                <input type="submit" value="Send">
+                <input type="submit" value="Send" class="btn-blue">
             </form>
         </div>
     </div>
-    <form action="{{ url_for('index.logout') }}" method="post">
-        <input type="submit" value="Logout">
-    </form>
+    <div id="logout">
+        <form action="{{ url_for('index.logout') }}" method="post">
+            <input type="submit" value="Logout" class="btn-blue">
+        </form>
+    </div>
     <script src="/static/script.js"></script>
+    <script>
+        particlesJS.load('particles-js', '/static/particles.json', function() {
+            console.log('particles.json loaded...');
+        });
+    </script>
 </body>
 </html>
