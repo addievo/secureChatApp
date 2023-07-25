@@ -98,3 +98,26 @@ def create_message(sender_id, receiver_id, content_for_sender, content_for_recei
     session.add(message)
     session.commit()
     session.close()
+
+def get_conversations_for_user(user_id):
+    session = Session()
+    sent_messages = session.query(Message).filter_by(sender_id=user_id).all()
+    received_messages = session.query(Message).filter_by(receiver_id=user_id).all()
+    session.close()
+
+    #Get unique users from sent and received messages
+    user_ids = set()
+    for message in sent_messages:
+        user_ids.add(message.receiver_id)
+    for message in received_messages:
+        user_ids.add(message.sender_id)
+
+    #Get usernames corresponding to IDS
+    usernames= []
+
+    for user_id in user_ids:
+        user = get_user(None, user_id)
+        if user:
+            usernames.append(user.username)
+
+    return usernames
