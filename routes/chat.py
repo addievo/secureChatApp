@@ -6,7 +6,7 @@ from encryption.encryption import encrypt_message, decrypt_message
 from flask import Blueprint
 from flask import json
 
-current_time = datetime.now()
+current_time = datetime.utcnow()
 
 bp = Blueprint('chat', __name__)
 
