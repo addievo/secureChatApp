@@ -2,9 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Login - Secure Chat App</title>
-    <link rel="stylesheet" href="/static/login-styles.css">
-     <!-- Import fonts and other styles from ref 1 index.html head -->
+    <title>Chat - Secure Chat App</title>
+    <link rel="stylesheet" href="/static/chat-styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
@@ -13,15 +12,34 @@
 <body>
     <div id="particles-js"></div>
     <div class="content">
-        <div class="centered-content">
-            <h1 class="h1">Login to <span class="main-font text-blue">Secure Chat App</span></h1><br>
-            <form action="{{ url_for('index.login') }}" method="post">
-                <input type="text" id="username" name="username" required placeholder="Username"><br>
-                <input type="password" id="password" name="password" required placeholder="Password"><br><br>
-                <input type="submit" class="btn-blue" value="Login">
-            </form>
-            <p class="signup">Don't have an account? <a href="{{ url_for('index.signup') }}" class="text-blue">Sign Up</a></p>
+        <h1 class="h1 text-blue">Chat</h1>
+        <div id="current-username">
+            Current User: {{ username }}
         </div>
+        <div id="chat-container">
+            <div id="sidebar">
+                <h2>Conversations</h2>
+                <ul id="conversation-list">
+                    <!-- List of conversations will be inserted here dynamically using JavaScript -->
+                </ul>
+                <h2>Start a new conversation</h2>
+                <input type="text" id="new-conversation" placeholder="Enter username">
+                <button id="start-conversation">Start Conversation</button>
+            </div>
+            <div id="main-conversation">
+                <div id="messages">
+                    <!-- Chat messages will be inserted here dynamically using JavaScript -->
+                </div>
+                <form id="send-message-form" action="{{ url_for('chat.send_message') }}" method="post">
+                    <input type="hidden" id="receiver_username" name="receiver_username">
+                    <input type="text" id="message" name="message" placeholder="Your message" required>
+                    <input type="submit" value="Send">
+                </form>
+            </div>
+        </div>
+        <form action="{{ url_for('index.logout') }}" method="post">
+            <input type="submit" value="Logout">
+        </form>
     </div>
     <script>
         particlesJS.load('particles-js', '/static/particles.json', function() {

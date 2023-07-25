@@ -29,65 +29,55 @@ body, html {
 }
 
 #sidebar {
-    width: 25%;
-    margin-right: 2em;
+    width: 30%;
     padding: 20px;
 }
 
 #main-conversation {
-    width: 70%;
-    text-align: center;
+    width: 65%;
     padding: 20px;
-}
-
-#chat-container {
-    display: flex;
-    justify-content: space-between;
 }
 
 .h1 {
     font-size: 2.5em;
-    margin-bottom: 0.5em;
+    margin-bottom: 1em;
 }
 
 .text-blue {
     color: #007BFF;
 }
 
-.form {
+#send-message-form {
     display: flex;
     flex-direction: column;
     gap: 20px;
     align-items: center;
 }
 
-.input {
+#message {
     padding: 10px;
     font-size: 1.2em;
-    width: 100%;
-    max-width: 300px;
+    width: 80%;
     border: none;
     border-radius: 3px;
-    margin-bottom: 20px;
+    margin-top: 20px;
 }
 
-.btn-blue {
+#start-conversation {
     display: inline-block;
-    padding: 0.8rem 1.5rem;
+    padding: 0.5em 1em;
     transition: all 0.3s;
     border-radius: 3px;
     border: none;
     cursor: pointer;
     color: white;
-    background-color: #3b82f6;
-    border: 2px solid #3b82f6;
+    background-color: #007BFF;
     margin-top: 10px;
 }
 
-.btn-blue:hover {
+#start-conversation:hover {
     transition: all 0.3s ease;
-    background: #0b63f3;
-    border: 2px solid #0b63f3;
+    background: #0056b3;
 }
 
 #messages {
@@ -101,12 +91,24 @@ body, html {
     background-color: #fff;
 }
 
-.logout-form {
+#logout-form {
     position: absolute;
     top: 20px;
     right: 20px;
 }
 
-#current-username, #new-conversation, #start-conversation, #conversation-list {
-    margin-bottom: 20px;
+#logout-form input[type=submit] {
+    display: inline-block;
+    padding: 0.5em 1em;
+    transition: all 0.3s;
+    border-radius: 3px;
+    border: none;
+    cursor: pointer;
+    color: white;
+    background-color: #dc3545;
+}
+
+#logout-form input[type=submit]:hover {
+    transition: all 0.3s ease;
+    background: #b22234;
 }
