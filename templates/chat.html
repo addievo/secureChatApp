@@ -1,9 +1,10 @@
+<!-- chat.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Chat - Secure Chat App</title>
-    <link rel="stylesheet" href="/static/styles.css">
+    <link rel="stylesheet" href="/static/chat-styles.css">
 </head>
 <body>
     <h1>Chat</h1>
@@ -11,10 +12,16 @@
         Current User: {{ username }}
     </div>
     <div id="chat-container">
-        <div id="conversations">
-            <!-- List of conversations will be inserted here dynamically using JavaScript -->
+        <div id="sidebar">
+            <h2>Conversations</h2>
+            <ul id="conversation-list">
+                <!-- List of conversations will be inserted here dynamically using JavaScript -->
+            </ul>
+            <h2>Start a new conversation</h2>
+            <input type="text" id="new-conversation" placeholder="Enter username">
+            <button id="start-conversation">Start Conversation</button>
         </div>
-        <div id="active-conversation">
+        <div id="main-conversation">
             <div id="messages">
                 <!-- Chat messages will be inserted here dynamically using JavaScript -->
             </div>
@@ -28,6 +35,6 @@
     <form action="{{ url_for('index.logout') }}" method="post">
         <input type="submit" value="Logout">
     </form>
+    <script src="/static/script.js"></script>
 </body>
-<script src="/static/script.js"></script>
 </html>

@@ -1,7 +1,7 @@
 from datetime import datetime
 from flask import request, session, jsonify, render_template
 from auth.middleware import require_login
-from database.database import get_user, create_message, get_messages_for_user
+from database.database import get_user, create_message, get_messages_for_user_and_partner, get_conversations_for_user
 from encryption.encryption import encrypt_message, decrypt_message
 from flask import Blueprint
 from flask import json
@@ -10,11 +10,18 @@ current_time = datetime.now()
 
 bp = Blueprint('chat', __name__)
 
+@bp.route('/get_conversations', methods=['GET'])
+@require_login
+def get_conversations():
+    username = session['username']
+    user = get_user(username)
+    conversations = get_conversations_for_user(user.id)
+    return jsonify(conversations), 200
 
 @bp.route('/send_message', methods=['POST'])
 @require_login
 def send_message():
-    data = json.loads(request.data)
+    data = request.get_json()
     sender_username = session['username']
     receiver_username = data['receiver_username']
     content = data['message']
@@ -43,9 +50,15 @@ def send_message():
 @require_login
 def get_messages():
     username = session['username']
+    partner_username = request.args.get('username')
     user = get_user(username)
+    partner = get_user(partner_username)
 
-    messages = get_messages_for_user(user.id)
+
+    if partner is None:
+        return jsonify({"error": "Partner does not exist"}), 400
+
+    messages = get_messages_for_user_and_partner(user.id, partner.id)
 
     decrypted_messages = []
     for message in messages:
@@ -64,6 +77,3 @@ def get_messages():
         decrypted_messages.append((sender.username, receiver.username, decrypted_content))
 
     return jsonify(decrypted_messages), 200
-
-# message stores user id, get_user is based on username, but get_messages is trying to get user based on their id,
-# which isn't how get_user works
