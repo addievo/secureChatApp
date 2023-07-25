@@ -1,64 +1,50 @@
-let lastMessage = null;
+let activeConversation = null;
+
+function fetchConversations() {
+    fetch('/get_conversations')
+        .then(response => response.json())
+        .then(conversations => {
+            const conversationsDiv = document.getElementById('conversations');
+            conversationsDiv.innerHTML = '';  // Clear the conversations list
+
+            for (let username of conversations) {
+                const div = document.createElement('div');
+                div.textContent = username;
+                div.onclick = function() {  // Set the active conversation when clicked
+                    activeConversation = username;
+                    fetchMessages();
+                };
+                conversationsDiv.appendChild(div);
+            }
+        });
+}
 
 function fetchMessages() {
-    fetch('/get_messages')
+    if (!activeConversation) {
+        return;  // Don't fetch messages if no conversation is active
+    }
+
+    fetch(`/get_messages?username=${activeConversation}`)
         .then(response => response.json())
-        .then(decrypted_messages => {
+        .then(messages => {
             const messagesDiv = document.getElementById('messages');
-            let newMessages = decrypted_messages;
+            messagesDiv.innerHTML = '';  // Clear the messages
 
-            if (lastMessage) {
-                const lastMessageIndex = decrypted_messages.findIndex(message => message[0] === lastMessage[0] && message[1] === lastMessage[1] && message[2] === lastMessage[2]);
-
-                if (lastMessageIndex !== -1) {
-                    newMessages = decrypted_messages.slice(lastMessageIndex + 1);
-                }
-            }
-
-            for (let message of newMessages){
-                const sender = message[0];
-                const receiver = message[1];
-                const content = message[2];
-
+            for (let message of messages) {
                 const p = document.createElement('p');
-                p.className = sender === '{{ username }}' ? 'sent' : 'received';  // Add a class to distinguish between sent and received messages
-
-                if (content.startsWith("http") && (content.endsWith(".png") || content.endsWith(".jpg") || content.endsWith(".jpeg") || content.endsWith(".gif"))) {
-                    const img = document.createElement('img');
-                    img.src = content;
-                    img.alt = content;
-                    p.appendChild(img);
-                } else if (content.startsWith("https://www.youtube.com/watch?v=")) {
-                    const iframe = document.createElement('iframe');
-                    const video_id = content.split("v=")[1];
-                    iframe.src = "https://www.youtube.com/embed/" + video_id;
-                    iframe.width = "560";
-                    iframe.height = "315";
-                    iframe.frameborder = "0";
-                    iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
-                    iframe.allowFullscreen = true;
-                    p.appendChild(iframe);
-                } else {
-                    const text = document.createTextNode(content);
-                    p.appendChild(text);
-                }
-
-                const senderReceiverInfo = document.createTextNode(`From ${sender} to ${receiver}: `);
-                p.prepend(senderReceiverInfo);
-
+                p.textContent = message.content;
                 messagesDiv.appendChild(p);
-            }
-
-            if (newMessages.length > 0) {
-                lastMessage = newMessages[newMessages.length - 1];
             }
         });
 }
 
 document.getElementById('send-message-form').addEventListener('submit', function(event) {
-    event.preventDefault(); // This line prevents the form from being submitted in the default way
+    event.preventDefault();
 
-    const receiver_username = document.getElementById('receiver_username').value;
+    if (!activeConversation) {
+        return;  // Don't send a message if no conversation is active
+    }
+
     const message = document.getElementById('message').value;
 
     fetch('/send_message', {
@@ -66,19 +52,16 @@ document.getElementById('send-message-form').addEventListener('submit', function
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ receiver_username, message })
+        body: JSON.stringify({ receiver_username: activeConversation, message })
     })
     .then(response => response.json())
     .then(data => {
         if (data.error) {
-            // Handle error
             console.error(data.error);
         } else {
-            // Clear form
-            document.getElementById('receiver_username').value = '';
             document.getElementById('message').value = '';
         }
     });
 });
 
-setInterval(fetchMessages, 1000);
+setInterval(fetchConversations, 5000);  // Fetch conversations every 5 seconds
