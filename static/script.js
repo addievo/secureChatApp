@@ -117,14 +117,10 @@ function fetchConversations() {
 }
 
 
-
-
 function fetchMessages() {
     const receiver_username = document.getElementById('receiver_username').value;
 
-    // Handle the case when the user tries to start a conversation with an empty username
     if (!receiver_username) {
-        // Clear existing messages if the active conversation has changed
         const messagesDiv = document.getElementById('messages');
         while (messagesDiv.firstChild) {
             messagesDiv.removeChild(messagesDiv.firstChild);
@@ -138,7 +134,6 @@ function fetchMessages() {
         .then(decrypted_messages => {
             const messagesDiv = document.getElementById('messages');
 
-            // Clear existing messages if the active conversation has changed
             if (receiver_username !== activeConversation) {
                 while (messagesDiv.firstChild) {
                     messagesDiv.removeChild(messagesDiv.firstChild);
@@ -158,14 +153,62 @@ function fetchMessages() {
 
             for (let message of newMessages) {
                 const messageElement = document.createElement('p');
-                messageElement.textContent = `${message[0]} to ${message[1]}: ${message[2]}`;
-                messagesDiv.appendChild(messageElement);
+                messageElement.textContent = `${message[0]} to ${message[1]}: `;
 
-                // Remember the last fetched message
+                // Check if the message content is a URL
+                if (validURL(message[2])) {
+                    // If the URL is an image/gif
+                    if (/\.(gif|jpe?g|tiff?|png|webp|bmp)$/i.test(message[2])) {
+                        const img = document.createElement('img');
+                        img.src = message[2];
+                        img.style.maxWidth= '852px';
+                        img.style.maxHeight= '480px';
+                        messageElement.appendChild(img);
+                    }
+                    // If the URL is a YouTube video
+                    else if (/youtu\.?be/i.test(message[2])) {
+                        const iframe = document.createElement('iframe');
+                        iframe.src = convertYouTubeURL(message[2]);
+                        iframe.style.width = '852px';
+                        iframe.style.height = '480px';
+                        messageElement.appendChild(iframe);
+                    }
+                    // Any other URL can just be linked
+                    else {
+                        const link = document.createElement('a');
+                        link.href = message[2];
+                        link.textContent = message[2];
+                        messageElement.appendChild(link);
+                    }
+                } else {
+                    // If not a URL, just add the message text
+                    messageElement.textContent += message[2];
+                }
+
+                messagesDiv.appendChild(messageElement);
                 lastMessage = message;
             }
         });
 }
+
+// Function to validate a URL
+function validURL(str) {
+    const pattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
+        '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // domain name
+        '((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR ip (v4) address
+        '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // port and path
+        '(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
+        '(\\#[-a-z\\d_]*)?$','i'); // fragment locator
+    return !!pattern.test(str);
+}
+
+// Function to convert a YouTube URL to an embed URL
+function convertYouTubeURL(url) {
+    return url.replace(/watch\?v=/, 'embed/');
+}
+
+
+
 setInterval(fetchConversations, 5000);
 setInterval(fetchMessages, 1000); // Fetch messages every second
 
