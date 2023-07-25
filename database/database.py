@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, or_
+from sqlalchemy import create_engine, or_, and_
 from sqlalchemy.orm import sessionmaker, joinedload
 from .models import Base, User, Message
 from cryptography.hazmat.primitives import serialization
@@ -11,7 +11,7 @@ Session = sessionmaker(bind=engine)
 
 
 # serialising RSA keys while loading from database
-#added id = user.id
+# added id = user.id
 def get_user(username, user_id=None):
     session = Session()
     if user_id:
@@ -80,13 +80,18 @@ def update_user(username, new_username=None, new_password_hash=None, new_public_
 
 # modifying to add joinedLoad to only load messages from same instance
 
-def get_messages_for_user(user_id):
+# changing to get_messages_for_user_and_partner
+
+def get_messages_for_user_and_partner(user_id, partner_id):
     session = Session()
     messages = session.query(Message).options(
         joinedload(Message.sender),
         joinedload(Message.receiver)
     ).filter(
-        or_(Message.sender_id == user_id, Message.receiver_id == user_id)
+        or_(
+            and_(Message.sender_id == user_id, Message.receiver_id == partner_id),
+            and_(Message.sender_id == partner_id, Message.receiver_id == user_id)
+        )
     ).all()
     session.close()
     return messages
@@ -94,10 +99,12 @@ def get_messages_for_user(user_id):
 
 def create_message(sender_id, receiver_id, content_for_sender, content_for_receiver, timestamp):
     session = Session()
-    message = Message(sender_id=sender_id, receiver_id=receiver_id, content_for_sender=content_for_sender,content_for_receiver=content_for_receiver, timestamp=timestamp)
+    message = Message(sender_id=sender_id, receiver_id=receiver_id, content_for_sender=content_for_sender,
+                      content_for_receiver=content_for_receiver, timestamp=timestamp)
     session.add(message)
     session.commit()
     session.close()
+
 
 def get_conversations_for_user(user_id):
     session = Session()
@@ -105,15 +112,15 @@ def get_conversations_for_user(user_id):
     received_messages = session.query(Message).filter_by(receiver_id=user_id).all()
     session.close()
 
-    #Get unique users from sent and received messages
+    # Get unique users from sent and received messages
     user_ids = set()
     for message in sent_messages:
         user_ids.add(message.receiver_id)
     for message in received_messages:
         user_ids.add(message.sender_id)
 
-    #Get usernames corresponding to IDS
-    usernames= []
+    # Get usernames corresponding to IDS
+    usernames = []
 
     for user_id in user_ids:
         user = get_user(None, user_id)
