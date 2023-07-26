@@ -6,7 +6,7 @@ from encryption.encryption import encrypt_message, decrypt_message
 from flask import Blueprint
 from flask import json
 
-current_time = datetime.utcnow()
+
 
 bp = Blueprint('chat', __name__)
 
@@ -23,6 +23,8 @@ def get_conversations():
 @bp.route('/send_message', methods=['POST'])
 @require_login
 def send_message():
+    current_time = datetime.utcnow()
+
     data = request.get_json()
     sender_username = session['username']
     receiver_username = data['receiver_username']
