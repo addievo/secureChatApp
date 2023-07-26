@@ -157,10 +157,11 @@ function fetchMessages() {
                 const timestamp = new Date(message[3]);
                 const date = timestamp.getDate();
                 const month = timestamp.getMonth() + 1;
+                const year = timestamp.getFullYear();
                 const hours = timestamp.getHours();
                 const minutes = timestamp.getMinutes();
 
-                messageElement.textContent = `${message[0]} to ${message[1]} on ${date}:${month} at ${hours}:${minutes < 10 ? '0' : ''}${minutes}: `;
+                messageElement.textContent = `${message[0]} to ${message[1]} ${date}/${month}/${year} at ${hours}:${minutes < 10 ? '0' : ''}${minutes}: `;
 
                 // Check if the message content is a URL
                 if (validURL(message[2])) {
