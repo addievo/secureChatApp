@@ -12,7 +12,9 @@ limiter = Limiter(key_func=get_remote_address)
 
 # Define your routes as before, but replace @app.route with @bp.route
 
-
+@bp.route('/healthcheck', methods=['GET'])
+def healthcheck():
+    return 'OK', 200
 
 @bp.route('/')
 def index():

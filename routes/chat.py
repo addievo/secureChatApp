@@ -10,6 +10,8 @@ current_time = datetime.utcnow()
 
 bp = Blueprint('chat', __name__)
 
+
+
 @bp.route('/get_conversations', methods=['GET'])
 @require_login
 def get_conversations():
