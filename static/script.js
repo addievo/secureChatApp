@@ -224,5 +224,5 @@ function convertYouTubeURL(url) {
 
 
 setInterval(fetchConversations, 5000);
-setInterval(fetchMessages, 500); // Fetch messages every second
+setInterval(fetchMessages, 2000); // Fetch messages every second
 
