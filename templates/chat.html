@@ -33,7 +33,7 @@
             <div id="messages">
                 <!-- Chat messages will be inserted here dynamically using JavaScript -->
             </div>
-            <form id="send-message-form" action="{{ url_for('chat.send_message') }}" method="post" enctype="multipart/form-data">
+            <form id="send-message-form" method="post" enctype="multipart/form-data">
                 <input type="hidden" id="receiver_username" name="receiver_username">
                 <input type="text" id="message" name="message" placeholder="Your message" required>
                 <button type="button" id="emoji-button">🙂</button>

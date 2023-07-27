@@ -1,7 +1,7 @@
 let lastMessage = null;
 let activeConversation = null;
 let currentConversation = null;
-
+var socket = io();
 document.getElementById('start-conversation').addEventListener('click', function(event) {
     event.preventDefault();
     event.stopPropagation();
@@ -24,29 +24,15 @@ document.getElementById('start-conversation').addEventListener('click', function
     }
 
     // If it doesn't exist, create a new conversation
-    const listItem = document.createElement('li');
-    listItem.setAttribute('data-conversation', newConversationUsername);
-
-    const conversationButton = document.createElement('button');
-    conversationButton.textContent = newConversationUsername;
-    conversationButton.addEventListener('click', function() {
-        document.getElementById('receiver_username').value = newConversationUsername;
-        activeConversation = newConversationUsername;
-        fetchMessages();
-    });
-
-    listItem.appendChild(conversationButton);
-    conversationList.appendChild(listItem);
+    socket.emit('start_conversation', { 'username': newConversationUsername });
 
     // Clear the new conversation input
     document.getElementById('new-conversation').value = '';
 });
 
 
+
 //send message event listener
-
-
-
 document.getElementById('send-message-form').addEventListener('submit', function(event) {
     event.preventDefault();
 
@@ -54,29 +40,11 @@ document.getElementById('send-message-form').addEventListener('submit', function
     const receiver_username = activeConversation;
     const message = document.getElementById('message').value;
 
-    fetch('/send_message', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ receiver_username, message })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.error) {
-            // Handle error
-            console.error(data.error);
-        } else {
-            // Clear form
-            document.getElementById('message').value = '';
-            // Fetch messages after a new message is sent
-            fetchMessages();
-        }
-    })
-    .catch(error => {
-        // This will catch any errors that aren't caught in the then() function
-        console.error('Error:', error);
-    });
+    // Emit a 'new_message' event to the server
+    socket.emit('new_message', { receiver_username, message });
+
+    // Clear the form
+    document.getElementById('message').value = '';
 });
 
 document.getElementById('message').addEventListener('keydown', function(event) {
@@ -84,6 +52,11 @@ document.getElementById('message').addEventListener('keydown', function(event) {
         event.preventDefault(); // Prevent newline being added to textarea
         document.getElementById('send-message-form').dispatchEvent(new Event('submit', { cancelable: true })); // Trigger form submission
     }
+});
+
+socket.on('message_sent', function(data) {
+    // Fetch messages after a new message is sent
+    addMessage(data);
 });
 
 let picker = document.querySelector('emoji-picker');
@@ -171,6 +144,19 @@ function fetchConversations() {
         });
 }
 
+function addMessage(data) {
+    // Assuming `data` is an object with a `message` field that holds the new message text
+    const messageText = data.message;
+
+    const messagesDiv = document.getElementById('messages');
+
+    // Create a new paragraph element to hold the message text
+    const messageElement = document.createElement('p');
+    messageElement.textContent = messageText;
+
+    // Append the new message to the chat
+    messagesDiv.appendChild(messageElement);
+}
 
 function fetchMessages() {
     const receiver_username = document.getElementById('receiver_username').value;
@@ -270,8 +256,11 @@ function convertYouTubeURL(url) {
     return url.replace(/watch\?v=/, 'embed/');
 }
 
-
-
+socket.on('new_message', function(data) {
+    // Append the new message to the message list
+    appendMessage(data);
+});
+onload(fetchConversations)
+onload(fetchMessages())
 setInterval(fetchConversations, 5000);
-setInterval(fetchMessages, 2000); // Fetch messages every second
 

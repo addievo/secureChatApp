@@ -6,7 +6,7 @@ from routes import index, user, chat
 from auth.middleware import log_request_info
 
 # app.py
-from create_app import create_app
+from create_app import create_app, socketio
 
 app = create_app()
 app.register_blueprint(index.bp)
@@ -47,4 +47,4 @@ parser.add_argument('--port', type=int, default=5000,
 
 if __name__ == "__main__":
     args = parser.parse_args()
-    app.run(host=args.host, port=args.port, debug=False, use_reloader=False)
+    socketio.run(app, host=args.host, port=args.port, debug=False, use_reloader=False)
