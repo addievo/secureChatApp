@@ -136,7 +136,7 @@ function uploadToImgur(base64data) {
         processData: false,
         method: 'POST',
         headers: {
-            Authorization: '5b588327c957f90',
+            Authorization: 'Client-ID ' + '5b588327c957f90',
             Accept: 'application/json'
         },
         data: {
