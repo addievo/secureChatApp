@@ -1,6 +1,8 @@
 let lastMessage = null;
 let activeConversation = null;
+let currentConversation = null;
 const socket = io.connect('http://192.168.1.92:5001');
+let lastConversations = [];  // Keep track of the last fetched conversations
 
 function fetchConversations() {
     fetch('/get_conversations')
@@ -29,11 +31,12 @@ function fetchConversations() {
         .catch(error => console.error('Error:', error));
 }
 
-function fetchMessages(receiver_username) {
-    document.getElementById('messages').innerHTML = '';
-    console.log('Fetching messages for:', receiver_username);  // Add debug output
-    console.log('Current active conversation:', activeConversation);  // Add debug output
 
+// Helper function to compare two arrays
+function arraysEqual(a, b) {
+    return a.length === b.length && a.every((val, index) => val === b[index]);
+}
+function fetchMessages(receiver_username) {
     if (!receiver_username) {
         receiver_username = document.getElementById('receiver_username').value;
     }
@@ -47,18 +50,19 @@ function fetchMessages(receiver_username) {
         return;
     }
 
+    if (receiver_username !== activeConversation) {
+        activeConversation = receiver_username;
+        const messagesDiv = document.getElementById('messages');
+        while (messagesDiv.firstChild) {
+            messagesDiv.removeChild(messagesDiv.firstChild);
+        }
+    }
+
     fetch(`/get_messages?username=${receiver_username}`)
         .then(response => response.json())
         .then(decrypted_messages => {
             const messagesDiv = document.getElementById('messages');
 
-            if (receiver_username !== activeConversation) {
-                console.log('Conversation has changed, clearing messages');  // Add debug output
-                while (messagesDiv.firstChild) {
-                    messagesDiv.removeChild(messagesDiv.firstChild);
-                }
-                activeConversation = receiver_username;
-            }
             for (let message of decrypted_messages) {
                 const messageElement = document.createElement('p');
                 //parse datetime
@@ -108,11 +112,8 @@ function fetchMessages(receiver_username) {
 }
 
 // Listen for 'new_message' event from the server
-document.getElementById('conversation-list').addEventListener('click', function(event) {
-    // Get the username of the conversation that was clicked
-    const username = event.target.textContent;
-    activeConversation = username;
-});
+fetchConversations()
+// Listen for 'new_message' event from the server
 
 
 document.getElementById('start-conversation').addEventListener('click', function(event) {
@@ -131,25 +132,6 @@ document.getElementById('start-conversation').addEventListener('click', function
 
     // Fetch messages for the new conversation
     fetchMessages(newConversationUsername);
-});
-
-
-socket.on('new_message', function(data) {
-    alert(activeConversation + " " + data.sender_username)
-    // Assuming `data` is an object with `sender_username` and `message` fields
-    if (data.sender_username === activeConversation) {
-        // If the new message is part of the active conversation, add it to the UI
-        addMessage(data);
-    }
-
-    // Add the new conversation to the conversation list if it's not already there
-    const conversationList = document.getElementById('conversation-list');
-    const existingConversations = Array.from(conversationList.getElementsByTagName('li')).map(li => li.textContent);
-    if (!existingConversations.includes(data.sender_username)) {
-        const listItem = document.createElement('li');
-        listItem.textContent = data.sender_username;
-        conversationList.appendChild(listItem);
-    }
 });
 
 
@@ -219,6 +201,21 @@ function addMessage(messageData) {
     // Append the new message to the chat
     messagesDiv.appendChild(messageElement);
 }
+socket.on('new_message', function(data) {
+    // Assuming `data` is an object with `sender_username` and `message` fields
+    if (data.sender_username === activeConversation) {
+        // If the new message is part of the active conversation, add it to the UI
+        addMessage(data);
+    }
+});
+
+
+// Call fetchConversations at regular intervals
+setInterval(fetchConversations, 5000);
+
+
+//This part works
+
 
 let picker = document.querySelector('emoji-picker');
 let pickerEventAdded = false; // New variable to track whether the event has been added
@@ -293,5 +290,3 @@ document.getElementById('message').addEventListener('keydown', function(event) {
         document.getElementById('send-message-form').dispatchEvent(new Event('submit', { cancelable: true })); // Trigger form submission
     }
 });
-fetchConversations()
-setInterval(fetchConversations, 5000)
