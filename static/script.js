@@ -171,9 +171,10 @@ function fetchConversations() {
         });
 }
 
-
-function fetchMessages() {
-    const receiver_username = document.getElementById('receiver_username').value;
+function fetchMessages(receiver_username) {
+    if (!receiver_username) {
+        receiver_username = document.getElementById('receiver_username').value;
+    }
 
     if (!receiver_username) {
         const messagesDiv = document.getElementById('messages');
@@ -184,29 +185,20 @@ function fetchMessages() {
         return;
     }
 
+    if (receiver_username !== activeConversation) {
+        activeConversation = receiver_username;
+        const messagesDiv = document.getElementById('messages');
+        while (messagesDiv.firstChild) {
+            messagesDiv.removeChild(messagesDiv.firstChild);
+        }
+    }
+
     fetch(`/get_messages?username=${receiver_username}`)
         .then(response => response.json())
         .then(decrypted_messages => {
             const messagesDiv = document.getElementById('messages');
 
-            if (receiver_username !== activeConversation) {
-                while (messagesDiv.firstChild) {
-                    messagesDiv.removeChild(messagesDiv.firstChild);
-                }
-                activeConversation = receiver_username;
-            }
-
-            let newMessages = decrypted_messages;
-
-            if (lastMessage) {
-                const lastMessageIndex = decrypted_messages.findIndex(message => message[0] === lastMessage[0] && message[1] === lastMessage[1] && message[2] === lastMessage[2]);
-
-                if (lastMessageIndex !== -1) {
-                    newMessages = decrypted_messages.slice(lastMessageIndex + 1);
-                }
-            }
-
-            for (let message of newMessages) {
+            for (let message of decrypted_messages) {
                 const messageElement = document.createElement('p');
                 //parse datetime
                 const timestamp = new Date(message[3]);
@@ -253,6 +245,7 @@ function fetchMessages() {
             }
         });
 }
+
 
 // Function to validate a URL
 function validURL(str) {
