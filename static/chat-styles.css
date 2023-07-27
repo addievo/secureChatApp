@@ -272,6 +272,8 @@ emoji-picker {
     --emoji-picker-button-active-background-color: #007BFF;
     --emoji-picker-button-hover-background-color: #007BFF;
     display: none;
+    width: 250px;
+    height: 250px;
 }
 
 #emoji-button {

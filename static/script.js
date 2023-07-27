@@ -86,6 +86,35 @@ document.getElementById('message').addEventListener('keydown', function(event) {
     }
 });
 
+let picker = document.querySelector('emoji-picker');
+let pickerEventAdded = false; // New variable to track whether the event has been added
+
+document.getElementById('emoji-button').addEventListener('click', function() {
+    if (!picker) {
+        console.error("Emoji picker not found");
+        return;
+    }
+
+    // Only add the event listener if it hasn't been added before
+    if (!pickerEventAdded) {
+        picker.addEventListener('emoji-click', function(event) {
+            // Insert the emoji at the cursor
+            let messageInput = document.getElementById('message');
+            let cursorPosition = messageInput.selectionStart;
+            messageInput.value = messageInput.value.substring(0, cursorPosition)
+                + event.detail.unicode
+                + messageInput.value.substring(cursorPosition);
+
+            picker.style.display = 'none'; // Hide the emoji picker
+        });
+
+        pickerEventAdded = true; // Mark that the event listener has been added
+    }
+
+    // Show or hide the emoji picker
+    picker.style.display = picker.style.display === 'none' ? 'block' : 'none';
+});
+
 
 
 
