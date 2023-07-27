@@ -118,35 +118,22 @@ document.getElementById('emoji-button').addEventListener('click', function() {
 
 document.getElementById('image').addEventListener('change', function() {
     var file = this.files[0];
-    var reader = new FileReader();
-    reader.onloadend = function() {
-        var base64data = reader.result;
-        uploadToImgur(base64data);
-    }
-    reader.readAsDataURL(file);
+    var formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', 'uue6qj3l');  // Your upload preset
+    uploadToCloudinary(formData);
 });
 
-function uploadToImgur(base64data) {
-    var apiUrl = 'https://api.imgur.com/3/image';
-    var imageData = base64data.split(',')[1];
-    console.log(imageData); // Add this line to debug
-    var settings = {
-        async: false,
-        crossDomain: true,
+function uploadToCloudinary(formData) {
+    var apiUrl = 'https://api.cloudinary.com/v1_1/ddxlk4go1/image/upload';  // Your Cloudinary cloud name
+    $.ajax(apiUrl, {
+        type: 'POST',
+        data: formData,
         processData: false,
-        method: 'POST',
-        headers: {
-            Authorization: 'Client-ID ' + '5b588327c957f90',
-            Accept: 'application/json'
-        },
-        data: {
-            image: imageData
-        }
-    };
-
-    $.ajax(apiUrl, settings).done(function(response) {
+        contentType: false,
+    }).done(function(response) {
         var messageInput = document.getElementById('message');
-        messageInput.value += response.data.link;
+        messageInput.value += response.secure_url;  // Use `secure_url` for the HTTPS version of the image URL
     });
 }
 
