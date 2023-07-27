@@ -122,9 +122,19 @@ document.getElementById('start-conversation').addEventListener('click', function
 
     const newConversationUsername = document.getElementById('new-conversation').value;
 
-    // No need to send a new message, so we'll remove that part
+    // Add the new conversation to the conversation list
+    const conversationList = document.getElementById('conversation-list');
+    const listItem = document.createElement('li');
+    listItem.textContent = newConversationUsername;
+    listItem.addEventListener('click', function() {
+        // Set activeConversation to the clicked conversation
+        activeConversation = newConversationUsername;
+        // Fetch messages for the new conversation
+        fetchMessages(newConversationUsername);
+    });
+    conversationList.appendChild(listItem);
 
-    // Just set the active conversation to the new username
+    // Set the active conversation to the new username
     activeConversation = newConversationUsername;
 
     // Clear the new conversation input
