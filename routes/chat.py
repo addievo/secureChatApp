@@ -107,7 +107,7 @@ def handle_new_message(data):
     sender_public_key = sender.public_key
     encrypted_message_for_sender = encrypt_message(sender_public_key, content)
 
-    current_time = datetime.now()
+    current_time = datetime.utcnow()
 
     # store both encrypted messages in database
     create_message(sender.id, receiver.id, encrypted_message_for_sender, encrypted_message_for_receiver, current_time)
