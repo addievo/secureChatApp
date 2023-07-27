@@ -9,6 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js" integrity="sha512-Kef5sc7gfTacR7TZKelcrRs15ipf7+t+n7Zh6mKNJbmW+/RRdCW9nwfLn4YX0s2nO6Kv5Y2ChqgIakaC6PW09A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://unpkg.com/emoji-picker-element"></script>
 </head>
 <body>
     <a href="https://Adityav.au" target="_blank">
@@ -33,6 +34,8 @@
             <form id="send-message-form" action="{{ url_for('chat.send_message') }}" method="post">
                 <input type="hidden" id="receiver_username" name="receiver_username">
                 <input type="text" id="message" name="message" placeholder="Your message" required>
+                <button id="emoji-button">🙂</button>
+                <div id="emoji-picker-container"></div>
                 <input type="submit" value="Send" class="btn-blue">
             </form>
         </div>

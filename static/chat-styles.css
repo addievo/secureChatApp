@@ -260,3 +260,24 @@ body, html {
     padding: 10px 20px;
   }
 }
+#emoji-picker-container {
+    position: absolute;
+    bottom: 100%;
+    right: 0;
+    z-index: 10;
+}
+
+emoji-picker {
+    --emoji-picker-background-color: #000;
+    --emoji-picker-button-active-background-color: #007BFF;
+    --emoji-picker-button-hover-background-color: #007BFF;
+    display: none;
+}
+
+#emoji-button {
+    background: none;
+    border: none;
+    font-size: 1.5em;
+    cursor: pointer;
+    color: #007BFF;
+}
