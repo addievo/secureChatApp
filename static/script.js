@@ -82,7 +82,7 @@ document.getElementById('send-message-form').addEventListener('submit', function
 document.getElementById('message').addEventListener('keydown', function(event) {
     if (event.keyCode === 13) { // keyCode for Enter key
         event.preventDefault(); // Prevent newline being added to textarea
-        document.getElementById('send-message-form').dispatchEvent(new Event('submit')); // Trigger form submission
+        document.getElementById('send-message-form').dispatchEvent(new Event('submit', { cancelable: true })); // Trigger form submission
     }
 });
 
