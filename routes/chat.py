@@ -113,3 +113,6 @@ def handle_new_message(data):
     create_message(sender.id, receiver.id, encrypted_message_for_sender, encrypted_message_for_receiver, current_time)
 
     emit('message_sent', {"success": "Message sent"})
+
+    # Emit a 'new_message' event with the message data
+    emit('new_message', {'sender_username': sender_username, 'receiver_username': receiver_username, 'message': content}, broadcast=True)
