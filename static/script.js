@@ -113,11 +113,7 @@ function fetchMessages(receiver_username) {
 
 // Listen for 'new_message' event from the server
 fetchConversations()
-document.getElementById('conversation-list').addEventListener('click', function(event) {
-    // Get the username of the conversation that was clicked
-    const username = event.target.textContent;
-    activeConversation = username;
-});
+// Listen for 'new_message' event from the server
 
 
 document.getElementById('start-conversation').addEventListener('click', function(event) {
@@ -136,25 +132,6 @@ document.getElementById('start-conversation').addEventListener('click', function
 
     // Fetch messages for the new conversation
     fetchMessages(newConversationUsername);
-});
-
-
-socket.on('new_message', function(data) {
-    alert(activeConversation + " " + data.sender_username)
-    // Assuming `data` is an object with `sender_username` and `message` fields
-    if (data.sender_username === activeConversation) {
-        // If the new message is part of the active conversation, add it to the UI
-        addMessage(data);
-    }
-
-    // Add the new conversation to the conversation list if it's not already there
-    const conversationList = document.getElementById('conversation-list');
-    const existingConversations = Array.from(conversationList.getElementsByTagName('li')).map(li => li.textContent);
-    if (!existingConversations.includes(data.sender_username)) {
-        const listItem = document.createElement('li');
-        listItem.textContent = data.sender_username;
-        conversationList.appendChild(listItem);
-    }
 });
 
 
@@ -224,8 +201,6 @@ function addMessage(messageData) {
     // Append the new message to the chat
     messagesDiv.appendChild(messageElement);
 }
-<<<<<<< HEAD
-=======
 socket.on('new_message', function(data) {
     // Assuming `data` is an object with `sender_username` and `message` fields
     if (data.sender_username === activeConversation) {
@@ -241,7 +216,6 @@ setInterval(fetchConversations, 5000);
 
 //This part works
 
->>>>>>> parent of d519d44 (cleared convo when switching convos)
 
 let picker = document.querySelector('emoji-picker');
 let pickerEventAdded = false; // New variable to track whether the event has been added
