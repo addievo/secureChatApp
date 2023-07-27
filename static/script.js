@@ -113,7 +113,6 @@ document.getElementById('conversation-list').addEventListener('click', function(
     const username = event.target.textContent;
 
     // Fetch messages for the new conversation
-    fetchMessages(username);
 });
 
 
