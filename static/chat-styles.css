@@ -43,7 +43,7 @@ body, html {
 }
 
 #main-conversation {
-    width: 70%;
+    width: 80%;
     padding: 20px;
     z-index: 2;
 }
@@ -133,7 +133,13 @@ body, html {
     border: 2px solid #0b63f3;
     z-index: 2;
 }
-
+#image-label {
+    background: none;
+    border: none;
+    font-size: 1.5em;
+    cursor: pointer;
+    color: #007BFF;
+}
 #start-conversation, #send-message-form input[type=submit]{
     color: white;
     background-color: #3b82f6;

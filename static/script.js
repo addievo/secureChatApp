@@ -116,6 +116,39 @@ document.getElementById('emoji-button').addEventListener('click', function() {
 });
 
 
+document.getElementById('image').addEventListener('change', function() {
+    var file = this.files[0];
+    var reader = new FileReader();
+    reader.onloadend = function() {
+        var base64data = reader.result;
+        uploadToImgur(base64data);
+    }
+    reader.readAsDataURL(file);
+});
+
+function uploadToImgur(base64data) {
+    var apiUrl = 'https://api.imgur.com/3/image';
+    var imageData = base64data.split(',')[1];
+    console.log(imageData); // Add this line to debug
+    var settings = {
+        async: false,
+        crossDomain: true,
+        processData: false,
+        method: 'POST',
+        headers: {
+            Authorization: '5b588327c957f90',
+            Accept: 'application/json'
+        },
+        data: {
+            image: imageData
+        }
+    };
+
+    $.ajax(apiUrl, settings).done(function(response) {
+        var messageInput = document.getElementById('message');
+        messageInput.value += response.data.link;
+    });
+}
 
 
 function fetchConversations() {

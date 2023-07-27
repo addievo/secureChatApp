@@ -12,6 +12,7 @@
 </head>
 <body>
     <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <a href="https://Adityav.au" target="_blank">
         <img class="logo" src="https://adityav.au/dist/img/logo.png" alt="Adityav Logo" style="width: 20%; height: auto">
     </a>
@@ -31,11 +32,13 @@
             <div id="messages">
                 <!-- Chat messages will be inserted here dynamically using JavaScript -->
             </div>
-            <form id="send-message-form" action="{{ url_for('chat.send_message') }}" method="post">
+            <form id="send-message-form" action="{{ url_for('chat.send_message') }}" method="post" enctype="multipart/form-data">
                 <input type="hidden" id="receiver_username" name="receiver_username">
                 <input type="text" id="message" name="message" placeholder="Your message" required>
                 <button type="button" id="emoji-button">🙂</button>
                 <emoji-picker class="dark"></emoji-picker>
+                <label for="image" id="image-label">📎</label>
+                <input type="file" id="image" name="image" accept="image/*" style="display: none;">
                 <input type="submit" value="Send" class="btn-blue">
             </form>
         </div>
