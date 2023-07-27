@@ -135,6 +135,7 @@ document.getElementById('start-conversation').addEventListener('click', function
 
 
 socket.on('new_message', function(data) {
+    alert(activeConversation + " " + data.sender_username)
     // Assuming `data` is an object with `sender_username` and `message` fields
     if (data.sender_username === activeConversation) {
         // If the new message is part of the active conversation, add it to the UI
