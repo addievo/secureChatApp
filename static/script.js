@@ -113,7 +113,13 @@ function fetchMessages(receiver_username) {
 
 // Listen for 'new_message' event from the server
 fetchConversations()
-// Listen for 'new_message' event from the server
+document.getElementById('conversation-list').addEventListener('click', function(event) {
+    // Get the username of the conversation that was clicked
+    const username = event.target.textContent;
+
+    // Fetch messages for the new conversation
+    fetchMessages(username);
+});
 
 
 document.getElementById('start-conversation').addEventListener('click', function(event) {
