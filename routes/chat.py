@@ -1,15 +1,15 @@
 from datetime import datetime
-from flask import request, session, jsonify, render_template
+
+from flask import Blueprint
+from flask import request, session, jsonify
+from flask_socketio import emit
+
 from auth.middleware import require_login
+from create_app import socketio
 from database.database import get_user, create_message, get_messages_for_user_and_partner, get_conversations_for_user
 from encryption.encryption import encrypt_message, decrypt_message
-from flask import Blueprint
-from flask import json
-
-
 
 bp = Blueprint('chat', __name__)
-
 
 
 @bp.route('/get_conversations', methods=['GET'])
@@ -19,6 +19,7 @@ def get_conversations():
     user = get_user(username)
     conversations = get_conversations_for_user(user.id)
     return jsonify(conversations), 200
+
 
 @bp.route('/send_message', methods=['POST'])
 @require_login
@@ -36,15 +37,15 @@ def send_message():
     if receiver is None:
         return jsonify({"error": "Receiver does not exist"}), 400
 
-    #encrypting message for receiver using receiver's public key
+    # encrypting message for receiver using receiver's public key
     receiver_public_key = receiver.public_key
     encrypted_message_for_receiver = encrypt_message(receiver_public_key, content)
 
-    #encrypting message for sender using sender's public key
+    # encrypting message for sender using sender's public key
     sender_public_key = sender.public_key
     encrypted_message_for_sender = encrypt_message(sender_public_key, content)
 
-    #store both encrypted messages in database
+    # store both encrypted messages in database
     create_message(sender.id, receiver.id, encrypted_message_for_sender, encrypted_message_for_receiver, current_time)
 
     return jsonify({"success": "Message sent"}), 200
@@ -57,7 +58,6 @@ def get_messages():
     partner_username = request.args.get('username')
     user = get_user(username)
     partner = get_user(partner_username)
-
 
     if partner is None:
         return jsonify({"error": "Partner does not exist"}), 400
@@ -81,3 +81,38 @@ def get_messages():
         decrypted_messages.append((sender.username, receiver.username, decrypted_content, message.timestamp))
 
     return jsonify(decrypted_messages), 200
+
+
+@socketio.on('new_message')
+@require_login
+def handle_new_message(data):
+    sender_username = session['username']
+    receiver_username = data['receiver_username']
+    content = data['message']
+
+    sender = get_user(sender_username)
+    receiver = get_user(receiver_username)
+
+    if receiver is None:
+        emit('error', {"error": "Receiver does not exist"})
+        return
+
+    # encrypting message for receiver using receiver's public key
+
+    receiver_public_key = receiver.public_key
+    encrypted_message_for_receiver = encrypt_message(receiver_public_key, content)
+
+    # encrypting message for sender using sender's public key
+
+    sender_public_key = sender.public_key
+    encrypted_message_for_sender = encrypt_message(sender_public_key, content)
+
+    current_time = datetime.utcnow()
+
+    # store both encrypted messages in database
+    create_message(sender.id, receiver.id, encrypted_message_for_sender, encrypted_message_for_receiver, current_time)
+
+    emit('message_sent', {"success": "Message sent"})
+
+    # Emit a 'new_message' event with the message data
+    emit('new_message', {'sender_username': sender_username, 'receiver_username': receiver_username, 'message': content}, broadcast=True)

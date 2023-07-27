@@ -1,142 +1,8 @@
 let lastMessage = null;
 let activeConversation = null;
 let currentConversation = null;
-
-document.getElementById('start-conversation').addEventListener('click', function(event) {
-    event.preventDefault();
-    event.stopPropagation();
-
-    const newConversationUsername = document.getElementById('new-conversation').value;
-    const conversationList = document.getElementById('conversation-list');
-    const existingListItems = conversationList.getElementsByTagName('li');
-
-    // Check if a conversation with the same username already exists
-    for (let listItem of existingListItems) {
-        if (listItem.getAttribute('data-conversation') === newConversationUsername) {
-            // If it exists, simply make it the active conversation and fetch messages
-            document.getElementById('receiver_username').value = newConversationUsername;
-            activeConversation = newConversationUsername;
-            fetchMessages();
-            // Clear the new conversation input
-            document.getElementById('new-conversation').value = '';
-            return;  // Exit the function early
-        }
-    }
-
-    // If it doesn't exist, create a new conversation
-    const listItem = document.createElement('li');
-    listItem.setAttribute('data-conversation', newConversationUsername);
-
-    const conversationButton = document.createElement('button');
-    conversationButton.textContent = newConversationUsername;
-    conversationButton.addEventListener('click', function() {
-        document.getElementById('receiver_username').value = newConversationUsername;
-        activeConversation = newConversationUsername;
-        fetchMessages();
-    });
-
-    listItem.appendChild(conversationButton);
-    conversationList.appendChild(listItem);
-
-    // Clear the new conversation input
-    document.getElementById('new-conversation').value = '';
-});
-
-
-//send message event listener
-
-
-
-document.getElementById('send-message-form').addEventListener('submit', function(event) {
-    event.preventDefault();
-
-    // Use the active conversation as the receiver_username
-    const receiver_username = activeConversation;
-    const message = document.getElementById('message').value;
-
-    fetch('/send_message', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ receiver_username, message })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.error) {
-            // Handle error
-            console.error(data.error);
-        } else {
-            // Clear form
-            document.getElementById('message').value = '';
-            // Fetch messages after a new message is sent
-            fetchMessages();
-        }
-    })
-    .catch(error => {
-        // This will catch any errors that aren't caught in the then() function
-        console.error('Error:', error);
-    });
-});
-
-document.getElementById('message').addEventListener('keydown', function(event) {
-    if (event.keyCode === 13) { // keyCode for Enter key
-        event.preventDefault(); // Prevent newline being added to textarea
-        document.getElementById('send-message-form').dispatchEvent(new Event('submit', { cancelable: true })); // Trigger form submission
-    }
-});
-
-let picker = document.querySelector('emoji-picker');
-let pickerEventAdded = false; // New variable to track whether the event has been added
-
-document.getElementById('emoji-button').addEventListener('click', function() {
-    if (!picker) {
-        console.error("Emoji picker not found");
-        return;
-    }
-
-    // Only add the event listener if it hasn't been added before
-    if (!pickerEventAdded) {
-        picker.addEventListener('emoji-click', function(event) {
-            // Insert the emoji at the cursor
-            let messageInput = document.getElementById('message');
-            let cursorPosition = messageInput.selectionStart;
-            messageInput.value = messageInput.value.substring(0, cursorPosition)
-                + event.detail.unicode
-                + messageInput.value.substring(cursorPosition);
-
-            picker.style.display = 'none'; // Hide the emoji picker
-        });
-
-        pickerEventAdded = true; // Mark that the event listener has been added
-    }
-
-    // Show or hide the emoji picker
-    picker.style.display = picker.style.display === 'none' ? 'block' : 'none';
-});
-
-
-document.getElementById('image').addEventListener('change', function() {
-    var file = this.files[0];
-    var formData = new FormData();
-    formData.append('file', file);
-    formData.append('upload_preset', 'uue6qj3l');  // Your upload preset
-    uploadToCloudinary(formData);
-});
-
-function uploadToCloudinary(formData) {
-    var apiUrl = 'https://api.cloudinary.com/v1_1/ddxlk4go1/image/upload';  // Your Cloudinary cloud name
-    $.ajax(apiUrl, {
-        type: 'POST',
-        data: formData,
-        processData: false,
-        contentType: false,
-    }).done(function(response) {
-        var messageInput = document.getElementById('message');
-        messageInput.value += response.secure_url;  // Use `secure_url` for the HTTPS version of the image URL
-    });
-}
-
+const socket = io.connect('http://192.168.1.92:5001');
+let lastConversations = [];  // Keep track of the last fetched conversations
 
 function fetchConversations() {
     fetch('/get_conversations')
@@ -144,36 +10,36 @@ function fetchConversations() {
         .then(conversations => {
             const conversationList = document.getElementById('conversation-list');
 
-            // Create a set of existing conversations
-            const existingConversations = new Set();
-            const existingListItems = conversationList.getElementsByTagName('li');
-            for (let listItem of existingListItems) {
-                existingConversations.add(listItem.getAttribute('data-conversation'));
+            // Remove all existing conversations from the list
+            while (conversationList.firstChild) {
+                conversationList.removeChild(conversationList.firstChild);
             }
 
+            // Add all the fetched conversations to the list
             for (let conversation of conversations) {
-                // If the conversation is not already in the list, add it
-                if (!existingConversations.has(conversation)) {
-                    const listItem = document.createElement('li');
-                    listItem.setAttribute('data-conversation', conversation); // Add data attribute
-                    const conversationButton = document.createElement('button');
-                    conversationButton.textContent = conversation;
-                    conversationButton.addEventListener('click', function() {
-                        document.getElementById('receiver_username').value = conversation;
-                        activeConversation = conversation;
-                        fetchMessages(); // Fetch messages for the selected conversation
-                    });
-
-                    listItem.appendChild(conversationButton);
-                    conversationList.appendChild(listItem);
-                }
+                const listItem = document.createElement('li');
+                listItem.textContent = conversation;
+                listItem.addEventListener('click', function() {
+                    // Set activeConversation to the clicked conversation
+                    activeConversation = conversation;
+                    // Fetch messages for the new conversation
+                    fetchMessages(conversation);
+                });
+                conversationList.appendChild(listItem);
             }
-        });
+        })
+        .catch(error => console.error('Error:', error));
 }
 
 
-function fetchMessages() {
-    const receiver_username = document.getElementById('receiver_username').value;
+// Helper function to compare two arrays
+function arraysEqual(a, b) {
+    return a.length === b.length && a.every((val, index) => val === b[index]);
+}
+function fetchMessages(receiver_username) {
+    if (!receiver_username) {
+        receiver_username = document.getElementById('receiver_username').value;
+    }
 
     if (!receiver_username) {
         const messagesDiv = document.getElementById('messages');
@@ -253,6 +119,163 @@ function fetchMessages() {
             }
         });
 }
+// Listen for 'new_message' event from the server
+fetchConversations()
+// Listen for 'new_message' event from the server
+
+
+document.getElementById('start-conversation').addEventListener('click', function(event) {
+    console.log('Start Conversation button clicked');
+    event.preventDefault();
+
+    const newConversationUsername = document.getElementById('new-conversation').value;
+
+    // No need to send a new message, so we'll remove that part
+
+    // Just set the active conversation to the new username
+    activeConversation = newConversationUsername;
+
+    // Clear the new conversation input
+    document.getElementById('new-conversation').value = '';
+
+    // Fetch messages for the new conversation
+    fetchMessages(newConversationUsername);
+});
+
+
+// Send message event listener
+document.getElementById('send-message-form').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    const receiver_username = activeConversation;
+    const message = document.getElementById('message').value;
+
+    // Emit a 'new_message' event with the message data
+    socket.emit('new_message', { receiver_username, message });
+
+    // Manually add the new message to the UI
+    addMessage({ sender_username: activeConversation, receiver_username: receiver_username, message: message });
+
+    // Clear form
+    document.getElementById('message').value = '';
+});
+
+function addMessage(messageData) {
+    const messagesDiv = document.getElementById('messages');
+
+    // Create a new paragraph element to hold the message text
+    const messageElement = document.createElement('p');
+
+    //parse datetime
+    const timestamp = new Date();
+    const date = timestamp.getDate();
+    const month = timestamp.getMonth() + 1;
+    const year = timestamp.getFullYear();
+    const hours = timestamp.getHours();
+    const minutes = timestamp.getMinutes();
+
+    messageElement.textContent = `${messageData.sender_username} to ${messageData.receiver_username} ${date}/${month}/${year} at ${hours}:${minutes < 10 ? '0' : ''}${minutes}: `;
+
+    // Check if the message content is a URL
+    if (validURL(messageData.message)) {
+        // If the URL is an image/gif
+        if (/\.(gif|jpe?g|tiff?|png|webp|bmp)$/i.test(messageData.message)) {
+            const img = document.createElement('img');
+            img.src = messageData.message;
+            img.style.maxWidth= '852px';
+            img.style.maxHeight= '480px';
+            messageElement.appendChild(img);
+        }
+        // If the URL is a YouTube video
+        else if (/youtu\.?be/i.test(messageData.message)) {
+            const iframe = document.createElement('iframe');
+            iframe.src = convertYouTubeURL(messageData.message);
+            iframe.style.width = '852px';
+            iframe.style.height = '480px';
+            messageElement.appendChild(iframe);
+        }
+        // Any other URL can just be linked
+        else {
+            const link = document.createElement('a');
+            link.href = messageData.message;
+            link.textContent = messageData.message;
+            messageElement.appendChild(link);
+        }
+    } else {
+        // If not a URL, just add the message text
+        messageElement.textContent += messageData.message;
+    }
+
+    // Append the new message to the chat
+    messagesDiv.appendChild(messageElement);
+}
+socket.on('new_message', function(data) {
+    // Assuming `data` is an object with `sender_username` and `message` fields
+    if (data.sender_username === activeConversation) {
+        // If the new message is part of the active conversation, add it to the UI
+        addMessage(data);
+    }
+});
+
+
+// Call fetchConversations at regular intervals
+setInterval(fetchConversations, 5000);
+
+
+//This part works
+
+
+let picker = document.querySelector('emoji-picker');
+let pickerEventAdded = false; // New variable to track whether the event has been added
+
+document.getElementById('emoji-button').addEventListener('click', function() {
+    if (!picker) {
+        console.error("Emoji picker not found");
+        return;
+    }
+
+    // Only add the event listener if it hasn't been added before
+    if (!pickerEventAdded) {
+        picker.addEventListener('emoji-click', function(event) {
+            // Insert the emoji at the cursor
+            let messageInput = document.getElementById('message');
+            let cursorPosition = messageInput.selectionStart;
+            messageInput.value = messageInput.value.substring(0, cursorPosition)
+                + event.detail.unicode
+                + messageInput.value.substring(cursorPosition);
+
+            picker.style.display = 'none'; // Hide the emoji picker
+        });
+
+        pickerEventAdded = true; // Mark that the event listener has been added
+    }
+
+    // Show or hide the emoji picker
+    picker.style.display = picker.style.display === 'none' ? 'block' : 'none';
+});
+
+
+document.getElementById('image').addEventListener('change', function() {
+    var file = this.files[0];
+    var formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', 'uue6qj3l');  // Your upload preset
+    uploadToCloudinary(formData);
+});
+
+function uploadToCloudinary(formData) {
+    var apiUrl = 'https://api.cloudinary.com/v1_1/ddxlk4go1/image/upload';  // Your Cloudinary cloud name
+    $.ajax(apiUrl, {
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+    }).done(function(response) {
+        var messageInput = document.getElementById('message');
+        messageInput.value += response.secure_url;  // Use `secure_url` for the HTTPS version of the image URL
+    });
+}
+
 
 // Function to validate a URL
 function validURL(str) {
@@ -269,9 +292,9 @@ function validURL(str) {
 function convertYouTubeURL(url) {
     return url.replace(/watch\?v=/, 'embed/');
 }
-
-
-
-setInterval(fetchConversations, 5000);
-setInterval(fetchMessages, 2000); // Fetch messages every second
-
+document.getElementById('message').addEventListener('keydown', function(event) {
+    if (event.keyCode === 13) { // keyCode for Enter key
+        event.preventDefault(); // Prevent newline being added to textarea
+        document.getElementById('send-message-form').dispatchEvent(new Event('submit', { cancelable: true })); // Trigger form submission
+    }
+});
