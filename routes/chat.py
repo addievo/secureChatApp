@@ -122,3 +122,8 @@ def handle_new_message(data):
     except Exception as e:
         print("An unexpected error occurred:", e)
         traceback.print_exc()
+
+
+@socketio.on('disconnect')
+def handle_disconnect():
+    print('Client disconnected')

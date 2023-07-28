@@ -75,3 +75,4 @@ def login():
 def logout():
     session.pop('username', None)
     return render_template('index.html')
+

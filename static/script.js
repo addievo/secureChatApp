@@ -145,6 +145,14 @@ document.getElementById('send-message-form').addEventListener('submit', function
     document.getElementById('message').value = '';
 });
 
+
+
+
+// Call fetchConversations at regular intervals
+setInterval(fetchConversations, 5000);
+
+
+//This part works
 function addMessage(messageData) {
     const messagesDiv = document.getElementById('messages');
 
@@ -201,14 +209,6 @@ socket.on('new_message', function(data) {
         addMessage(data);
     }
 });
-
-
-// Call fetchConversations at regular intervals
-setInterval(fetchConversations, 5000);
-
-
-//This part works
-
 
 let picker = document.querySelector('emoji-picker');
 let pickerEventAdded = false; // New variable to track whether the event has been added
@@ -283,3 +283,11 @@ document.getElementById('message').addEventListener('keydown', function(event) {
         document.getElementById('send-message-form').dispatchEvent(new Event('submit', { cancelable: true })); // Trigger form submission
     }
 });
+
+// Call this function when the client is closing
+function handleClientClosing() {
+    socket.disconnect();
+}
+window.onbeforeunload = function() {
+    handleClientClosing();
+}
