@@ -29,7 +29,6 @@ function fetchConversations() {
         .catch(error => console.error('Error:', error));
 }
 function fetchMessages(receiver_username) {
-    document.getElementById('message').innerHTML = '';
     if (!receiver_username) {
         receiver_username = document.getElementById('receiver_username').value;
     }
