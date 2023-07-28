@@ -1,8 +1,6 @@
 let lastMessage = null;
 let activeConversation = null;
-let currentConversation = null;
 const socket = io.connect('https://chat.adityav.au');
-let lastConversations = [];  // Keep track of the last fetched conversations
 
 function fetchConversations() {
     fetch('/get_conversations')
@@ -30,13 +28,8 @@ function fetchConversations() {
         })
         .catch(error => console.error('Error:', error));
 }
-
-
-// Helper function to compare two arrays
-function arraysEqual(a, b) {
-    return a.length === b.length && a.every((val, index) => val === b[index]);
-}
 function fetchMessages(receiver_username) {
+    document.getElementById('message').innerHTML = '';
     if (!receiver_username) {
         receiver_username = document.getElementById('receiver_username').value;
     }
