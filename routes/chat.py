@@ -3,7 +3,7 @@ from datetime import datetime
 from flask import Blueprint
 from flask import request, session, jsonify
 from flask_socketio import emit
-
+from flask_socketio import ConnectionError
 from auth.middleware import require_login
 from create_app import socketio
 from database.database import get_user, create_message, get_messages_for_user_and_partner, get_conversations_for_user
@@ -86,33 +86,37 @@ def get_messages():
 @socketio.on('new_message')
 @require_login
 def handle_new_message(data):
-    sender_username = session['username']
-    receiver_username = data['receiver_username']
-    content = data['message']
+    try:
+        sender_username = session['username']
+        receiver_username = data['receiver_username']
+        content = data['message']
 
-    sender = get_user(sender_username)
-    receiver = get_user(receiver_username)
+        sender = get_user(sender_username)
+        receiver = get_user(receiver_username)
 
-    if receiver is None:
-        emit('error', {"error": "Receiver does not exist"})
-        return
+        if receiver is None:
+            emit('error', {"error": "Receiver does not exist"})
+            return
 
-    # encrypting message for receiver using receiver's public key
+        # encrypting message for receiver using receiver's public key
 
-    receiver_public_key = receiver.public_key
-    encrypted_message_for_receiver = encrypt_message(receiver_public_key, content)
+        receiver_public_key = receiver.public_key
+        encrypted_message_for_receiver = encrypt_message(receiver_public_key, content)
 
-    # encrypting message for sender using sender's public key
+        # encrypting message for sender using sender's public key
 
-    sender_public_key = sender.public_key
-    encrypted_message_for_sender = encrypt_message(sender_public_key, content)
+        sender_public_key = sender.public_key
+        encrypted_message_for_sender = encrypt_message(sender_public_key, content)
 
-    current_time = datetime.utcnow()
+        current_time = datetime.utcnow()
 
-    # store both encrypted messages in database
-    create_message(sender.id, receiver.id, encrypted_message_for_sender, encrypted_message_for_receiver, current_time)
+        # store both encrypted messages in database
+        create_message(sender.id, receiver.id, encrypted_message_for_sender, encrypted_message_for_receiver, current_time)
 
-    emit('message_sent', {"success": "Message sent"})
+        emit('message_sent', {"success": "Message sent"})
 
-    # Emit a 'new_message' event with the message data
-    emit('new_message', {'sender_username': sender_username, 'receiver_username': receiver_username, 'message': content}, broadcast=True)
+        # Emit a 'new_message' event with the message data
+        emit('new_message', {'sender_username': sender_username, 'receiver_username': receiver_username, 'message': content}, broadcast=True)
+
+    except ConnectionError:
+        print("Connection error")
