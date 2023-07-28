@@ -4,8 +4,6 @@ from flask import Flask, url_for
 from flask_session import Session
 from routes import index, user, chat
 from auth.middleware import log_request_info
-import ssl
-from waitress import serve
 from flask_cors import CORS
 
 # app.py
@@ -44,12 +42,9 @@ spec = importlib.util.spec_from_file_location("index", "./routes/index.py")
 index = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(index)
 
-cert_path = 'certificate.pem'
-key_path = 'privatekey.pem'
-ssl_context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
-ssl_context.load_cert_chain(certfile=cert_path, keyfile=key_path)
-
-
+print("Starting server...")
 
 if __name__ == "__main__":
-    socketio.run(app, host='192.168.1.90', port='5201', ssl_context=ssl_context)
+    print("Inside main...")
+    socketio.run(app, host='192.168.1.90', port='5201')
+    print("Server started.")
