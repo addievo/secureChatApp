@@ -3,11 +3,11 @@ from datetime import datetime
 from flask import Blueprint
 from flask import request, session, jsonify
 from flask_socketio import emit
-from flask_socketio import ConnectionError
 from auth.middleware import require_login
 from create_app import socketio
 from database.database import get_user, create_message, get_messages_for_user_and_partner, get_conversations_for_user
 from encryption.encryption import encrypt_message, decrypt_message
+import traceback
 
 bp = Blueprint('chat', __name__)
 
@@ -117,6 +117,8 @@ def handle_new_message(data):
 
         # Emit a 'new_message' event with the message data
         emit('new_message', {'sender_username': sender_username, 'receiver_username': receiver_username, 'message': content}, broadcast=True)
-
-    except ConnectionError:
-        print("Connection error")
+    except BrokenPipeError:
+        print("BrokenPipeError occurred")
+    except Exception as e:
+        print("An unexpected error occurred:", e)
+        traceback.print_exc()
