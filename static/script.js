@@ -2,6 +2,11 @@ let lastMessage = null;
 let activeConversation = null;
 const socket = io.connect('https://chat.adityav.au');
 
+
+function messageClearer() {
+
+    document.getElementById('message').value = '';
+}
 function fetchConversations() {
     fetch('/get_conversations')
         .then(response => response.json())
@@ -21,7 +26,9 @@ function fetchConversations() {
                     // Set activeConversation to the clicked conversation
                     activeConversation = conversation;
                     // Fetch messages for the new conversation
+                    messageClearer();
                     fetchMessages(conversation);
+
                 });
                 conversationList.appendChild(listItem);
             }
