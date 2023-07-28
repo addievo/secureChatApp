@@ -61,7 +61,7 @@ function fetchMessages(receiver_username) {
         .then(response => response.json())
         .then(decrypted_messages => {
             const messagesDiv = document.getElementById('messages');
-
+            messageClearer();
             for (let message of decrypted_messages) {
                 const messageElement = document.createElement('p');
                 //parse datetime
