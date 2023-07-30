@@ -295,3 +295,6 @@ document.getElementById('message').addEventListener('keydown', function(event) {
         document.getElementById('send-message-form').dispatchEvent(new Event('submit', { cancelable: true })); // Trigger form submission
     }
 });
+socket.on('disconnect', function() {
+    console.log('Socket disconnected');
+});

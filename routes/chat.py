@@ -116,3 +116,12 @@ def handle_new_message(data):
 
     # Emit a 'new_message' event with the message data
     emit('new_message', {'sender_username': sender_username, 'receiver_username': receiver_username, 'message': content}, broadcast=True)
+
+@socketio.on('new_message')
+@require_login
+def handle_new_message(data):
+    logging.debug(f'New message from {session["username"]}: {data}')
+
+@socketio.on('disconnect')
+def handle_disconnect():
+    print('Client disconnected')
