@@ -40,9 +40,9 @@ index = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(index)
 
 parser = argparse.ArgumentParser(description="Run the Flask app")
-parser.add_argument('--host', type=str, default='127.0.0.1',
+parser.add_argument('--host', type=str, default='192.168.1.92',
                     help='What host to listen on (default is 127.0.0.1)')
-parser.add_argument('--port', type=int, default=5000,
+parser.add_argument('--port', type=int, default=5001,
                     help='What port to listen on (default is 5000)')
 
 if __name__ == "__main__":

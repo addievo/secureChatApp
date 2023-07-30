@@ -41,28 +41,24 @@ function fetchMessages(receiver_username) {
         receiver_username = document.getElementById('receiver_username').value;
     }
 
+    // Clear the message div no matter what
+    const messagesDiv = document.getElementById('messages');
+    while (messagesDiv.firstChild) {
+        messagesDiv.removeChild(messagesDiv.firstChild);
+    }
+
     if (!receiver_username) {
-        const messagesDiv = document.getElementById('messages');
-        while (messagesDiv.firstChild) {
-            messagesDiv.removeChild(messagesDiv.firstChild);
-        }
         activeConversation = null;
         return;
     }
 
     if (receiver_username !== activeConversation) {
         activeConversation = receiver_username;
-        const messagesDiv = document.getElementById('messages');
-        while (messagesDiv.firstChild) {
-            messagesDiv.removeChild(messagesDiv.firstChild);
-        }
     }
 
     fetch(`/get_messages?username=${receiver_username}`)
         .then(response => response.json())
         .then(decrypted_messages => {
-            const messagesDiv = document.getElementById('messages');
-
             for (let message of decrypted_messages) {
                 const messageElement = document.createElement('p');
                 //parse datetime
