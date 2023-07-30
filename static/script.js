@@ -135,21 +135,27 @@ document.getElementById('start-conversation').addEventListener('click', function
 
 
 // Send message event listener
+// Send message event listener
+// Send message event listener
 document.getElementById('send-message-form').addEventListener('submit', function(event) {
     event.preventDefault();
 
     const receiver_username = activeConversation;
     const message = document.getElementById('message').value;
 
+    // Fetch the current user's username from the HTML
+    const sender_username = document.getElementById('current-username').textContent.split(": ")[1];
+
     // Emit a 'new_message' event with the message data
     socket.emit('new_message', { receiver_username, message });
 
     // Manually add the new message to the UI
-    addMessage({ sender_username: activeConversation, receiver_username: receiver_username, message: message });
+    addMessage({ sender_username: sender_username, receiver_username: receiver_username, message: message });
 
     // Clear form
     document.getElementById('message').value = '';
 });
+
 
 function addMessage(messageData) {
     const messagesDiv = document.getElementById('messages');
