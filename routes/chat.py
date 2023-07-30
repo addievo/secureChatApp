@@ -86,6 +86,8 @@ def get_messages():
 @socketio.on('new_message')
 @require_login
 def handle_new_message(data):
+    logging.debug(f'New message from {session["username"]}: {data}')
+
     sender_username = session['username']
     receiver_username = data['receiver_username']
     content = data['message']
@@ -98,12 +100,10 @@ def handle_new_message(data):
         return
 
     # encrypting message for receiver using receiver's public key
-
     receiver_public_key = receiver.public_key
     encrypted_message_for_receiver = encrypt_message(receiver_public_key, content)
 
     # encrypting message for sender using sender's public key
-
     sender_public_key = sender.public_key
     encrypted_message_for_sender = encrypt_message(sender_public_key, content)
 
@@ -117,11 +117,7 @@ def handle_new_message(data):
     # Emit a 'new_message' event with the message data
     emit('new_message', {'sender_username': sender_username, 'receiver_username': receiver_username, 'message': content}, broadcast=True)
 
-@socketio.on('new_message')
-@require_login
-def handle_new_message(data):
-    logging.debug(f'New message from {session["username"]}: {data}')
-
 @socketio.on('disconnect')
 def handle_disconnect():
-    print('Client disconnected')
+    logging.debug('Client disconnected')
+
