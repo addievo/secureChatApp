@@ -15,6 +15,8 @@ def create_app():
     app.config['SESSION_TYPE'] = 'filesystem'
     Session(app)
     socketio.init_app(app) # initialize socketio object
+    socketio = SocketIO(app, cors_allowed_origins="*") # allow all origins
+
 
 
     return app
