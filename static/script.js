@@ -107,6 +107,8 @@ function fetchMessages(receiver_username) {
                 messagesDiv.appendChild(messageElement);
                 lastMessage = message;
             }
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
         });
 }
 
