@@ -1,7 +1,7 @@
 let lastMessage = null;
 let activeConversation = null;
 let currentConversation = null;
-const socket = io.connect('https://chat.adityav.au', {
+const socket = io.connect('https://chat.adityav.au/ws/', {
     upgrade: false,
     transports: ['websocket']
 });
