@@ -1,9 +1,9 @@
 let lastMessage = null;
 let activeConversation = null;
 let currentConversation = null;
-const socket = io.connect('wss://192.168.1.91:5201', {
+const socket = io.connect('https://chat.adityav.au', {
     upgrade: false,
-    transports: ['websocket']
+    transports: ['websocket', 'polling']
 });
 let lastConversations = [];  // Keep track of the last fetched conversations
 
