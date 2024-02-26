@@ -4,7 +4,7 @@ from .models import Base, User, Message
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.backends import default_backend
 
-engine = create_engine('sqlite:///chat.db')  # Use SQLite for simplicity
+engine = create_engine('sqlite:///active_database/chat.db')
 Base.metadata.create_all(engine)
 
 Session = sessionmaker(bind=engine)
